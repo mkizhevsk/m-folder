@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    tools:context=".MainActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/firstRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/coverImage"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/folder"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/trackColumn"
+            app:layout_constraintTop_toBottomOf="@id/trackInfo" />
+
+        <TextView
+            android:id="@+id/trackInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text=""
+            android:textColor="@drawable/track_info"
+            app:layout_constraintBottom_toTopOf="@+id/coverImage"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/trackColumn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/trackColumn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginRight="10dp"
+            app:layout_constraintLeft_toRightOf="@id/coverImage"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textSong"
+                android:layout_width="wrap_content"
+                android:layout_height="19dp"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:textColor="@drawable/track_info"
+                android:textSize="14dp"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="19dp"
+                android:layout_marginTop="16dp"
+                android:text=""
+                android:textColor="@drawable/track_info"
+                android:textSize="14dp"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textSong" />
+
+            <TextView
+                android:id="@+id/textAlbum"
+                android:layout_width="wrap_content"
+                android:layout_height="19dp"
+                android:layout_marginTop="16dp"
+                android:text=""
+                android:textColor="@drawable/track_info"
+                android:textSize="14dp"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textArtist" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <SeekBar
+        android:id="@+id/play_audio_seek_bar"
+        style="@style/MySeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="-8dp"
+        android:max="100"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/firstRow" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/secondBtnRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/play_audio_seek_bar">
+
+        <Button
+            android:id="@+id/btnPlayPause"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="50"
+            android:onClick="onClick"
+            android:text="pause"
+            android:textSize="12dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/btnForward"
+            app:layout_constraintTop_toTopOf="parent"></Button>
+
+        <Button
+            android:id="@+id/btnForward"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="50"
+            android:onClick="onClick"
+            android:text="forward"
+            android:textSize="12dp"
+            app:layout_constraintLeft_toRightOf="@id/btnPlayPause"
+            app:layout_constraintRight_toLeftOf="@id/nextTrack"
+            app:layout_constraintTop_toTopOf="parent"></Button>
+
+        <Button
+            android:id="@+id/nextTrack"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:alpha="50"
+            android:onClick="playNextTrack"
+            android:text="Next track"
+            android:textSize="12dp"
+            app:layout_constraintLeft_toRightOf="@id/btnForward"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"></Button>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ListView
+        android:id="@+id/list_items"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/secondBtnRow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
