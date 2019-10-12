@@ -1,5 +1,6 @@
 package com.mk.m_folder.data.thread;
 
+import android.media.MediaMetadataRetriever;
 import android.util.Log;
 
 import com.mk.m_folder.MainActivity;
@@ -7,20 +8,19 @@ import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.entity.Track;
 
 import java.io.File;
-import java.lang.annotation.Target;
 
-import static com.mk.m_folder.data.InOut.otherFiles;
 import static com.mk.m_folder.data.InOut.properFiles;
 import static com.mk.m_folder.data.Player.allTracks;
-import static com.mk.m_folder.data.Player.mmr;
 import static com.mk.m_folder.data.Player.playList;
-import static com.mk.m_folder.data.Player.wrongSongs;
 import static com.mk.m_folder.data.Player.artists;
 
 public class TracksRunnable implements Runnable {
 
     public static boolean running = false;
+
     private static final String TAG = "MainActivity";
+
+    private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
     public void run() {
         running = true;

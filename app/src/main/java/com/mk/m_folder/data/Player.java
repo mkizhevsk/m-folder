@@ -58,7 +58,7 @@ public class Player {
     public static MediaSession mediaSession;
     public static AudioManager.OnAudioFocusChangeListener afChangeListener;
 
-    public static MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+    private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
     private Context context;
     private Activity mainActivity;
@@ -281,7 +281,7 @@ public class Player {
 
                     if(keyCode == 87) {
                         nextTrack();
-                    } else if(keyCode == 127) {
+                    } else if(keyCode == 127 || keyCode == 126) {
                         playPause();
                     } else if(keyCode == 88) {
                         previousTrack();
