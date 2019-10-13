@@ -34,9 +34,9 @@ public class InOut {
     MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
     SharedPreferences sPref;
-    //static String savedText;
     final String SAVED_PATH = "saved_text";
-    public static String tempPath = "/storage/1944-3E26/Android/data/itunes.android.synctunesultimate/files";
+    public static String tempPath = "/storage/1944-3E26/music";
+    //public static String tempPath = "/storage/1944-3E26/Android/data/itunes.android.synctunesultimate/files";
 
     private static final String TAG = "InOut";
 

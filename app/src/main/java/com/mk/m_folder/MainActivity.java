@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    //Helper helper;
     Player player;
 
     public static int listLevel = 0;
@@ -117,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
+
     // media content
     public void showArtists() {
         String[] stringArtists = new String[artists.size()];
@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
                                     int position, long id) {
                 //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
                 view.setSelected(true);
-                //adapter.setSelectedItem(position);
                 Collections.sort(artists.get(position).getAlbums());
 
                 MainActivity.artistId = position;
