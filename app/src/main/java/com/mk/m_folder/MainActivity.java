@@ -23,6 +23,7 @@ import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
+import com.mk.m_folder.data.thread.BluetoothRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,6 +130,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        Thread bluetoothThread = new Thread(new BluetoothRunnable(bluetoothAdapter));
+        bluetoothThread.start();
     }
 
 
@@ -342,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
 //        if(audioManager != null) {
 //            audioManager.abandonAudioFocus(afChangeListener);
 //        }
+        BluetoothRunnable.running = false;
 
         player.reset();
 
