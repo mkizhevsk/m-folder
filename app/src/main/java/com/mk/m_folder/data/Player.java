@@ -271,6 +271,7 @@ public class Player {
             public void onPlay() {//
                 mediaSession.setActive(true);
             }
+
             @Override
             public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
                 //Log.d(TAG, "onMediaButtonEvent called: " + mediaButtonIntent);
@@ -289,6 +290,7 @@ public class Player {
                 }
                 return super.onMediaButtonEvent(mediaButtonIntent);
             }
+
             @Override
             public void onSkipToNext() {
                 Log.d(TAG, "onSkipToNext called (media button pressed)");
@@ -346,6 +348,11 @@ public class Player {
                     mediaSession.release();
                 }
                 Log.d(TAG, "reset mediaPlayer success!");
+
+                if(audioManager != null) {
+                    audioManager.abandonAudioFocus(afChangeListener);
+                    Log.d(TAG, "abandon AudioFocus");
+                }
 
                 TracksRunnable.running = false;
                 try {

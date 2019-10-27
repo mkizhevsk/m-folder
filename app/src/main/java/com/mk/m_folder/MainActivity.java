@@ -3,6 +3,8 @@ package com.mk.m_folder;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,12 +27,11 @@ import com.mk.m_folder.data.entity.Track;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.mk.m_folder.data.InOut.tempPath;
-import static com.mk.m_folder.data.Player.afChangeListener;
 import static com.mk.m_folder.data.Player.allTracks;
 import static com.mk.m_folder.data.Player.artists;
-import static com.mk.m_folder.data.Player.audioManager;
 import static com.mk.m_folder.data.Player.isPlaying;
 import static com.mk.m_folder.data.Player.mediaPlayer;
 import static com.mk.m_folder.data.Player.playList;
@@ -114,6 +115,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            Log.d(TAG, "bluetoothAdapter == null");
+        } else {
+            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+            for(BluetoothDevice bluetoothDevice : pairedDevices) {
+                //Log.d(TAG, bluetoothDevice.getName());
+                if(bluetoothDevice.getName().equals("Q1 Android")) {
+                    Log.d(TAG, bluetoothDevice.getName());
+                }
+            }
+        }
+
     }
 
 
@@ -324,9 +339,9 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = false;
         InOut.getInstance().savePath(this, tempPath);
 
-        if(audioManager != null) {
-            audioManager.abandonAudioFocus(afChangeListener);
-        }
+//        if(audioManager != null) {
+//            audioManager.abandonAudioFocus(afChangeListener);
+//        }
 
         player.reset();
 
