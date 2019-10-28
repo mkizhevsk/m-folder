@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
+    public static int tempInt = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -20,8 +20,9 @@ public class OutputStreamRunnable implements Runnable {
     public void run() {
         try {
             DataOutputStream out = new DataOutputStream(bluetoothSocket.getOutputStream());
-            out.writeInt(7);
-            Log.e(TAG, "7 was sent");
+            int intOut = 7;
+            out.writeInt(intOut);
+            Log.e(TAG, "server out: " + intOut);
             //Integer[] export = {1, 2 , 3};
         } catch (IOException e) {
             Log.e(TAG, "sending attempt failed", e);

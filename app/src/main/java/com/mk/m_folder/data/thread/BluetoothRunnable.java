@@ -34,26 +34,29 @@ public class BluetoothRunnable implements Runnable {
     public void run() {
             running = true;
             Log.d(TAG, "bluetooth run start");
-            BluetoothSocket socket = null;
+            BluetoothSocket bluetoothSocket = null;
             // Keep listening until exception occurs or a socket is returned.
             while (running) {
-                Log.d(TAG, "start");
+                Log.d(TAG, "start running");
                 try {
                     Log.d(TAG, "1");
-                    socket = bluetoothServerSocket.accept();
+                    bluetoothSocket = bluetoothServerSocket.accept();
                     Log.d(TAG, "2");
                 } catch (IOException e) {
                     Log.e(TAG, "Socket's accept() method failed", e);
                     break;
                 }
 
-                if (socket != null) {
+                if (bluetoothSocket != null) {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
                     Log.d(TAG, "connection was accepted");
 
-                    Thread thread = new Thread(new OutputStreamRunnable(socket));
-                    thread.start();
+                    Thread outputStreamThread = new Thread(new OutputStreamRunnable(bluetoothSocket));
+                    outputStreamThread.start();
+
+                    Thread inputStreamThread = new Thread(new InputStreamRunnable(bluetoothSocket));
+                    inputStreamThread.start();
 
                     //bluetoothServerSocket.close();
                     //break;
