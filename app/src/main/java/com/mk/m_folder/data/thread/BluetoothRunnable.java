@@ -55,7 +55,6 @@ public class BluetoothRunnable implements Runnable {
                     Thread thread = new Thread(new OutputStreamRunnable(socket));
                     thread.start();
 
-                    //manageMyConnectedSocket(socket);
                     //bluetoothServerSocket.close();
                     //break;
                 } else {

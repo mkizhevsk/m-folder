@@ -28,7 +28,6 @@ import com.mk.m_folder.data.thread.BluetoothRunnable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static com.mk.m_folder.data.InOut.tempPath;
 import static com.mk.m_folder.data.Player.allTracks;
@@ -118,20 +117,16 @@ public class MainActivity extends AppCompatActivity {
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            Log.d(TAG, "bluetoothAdapter == null");
-        } else {
-            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-            for(BluetoothDevice bluetoothDevice : pairedDevices) {
-                //Log.d(TAG, bluetoothDevice.getName());
-                if(bluetoothDevice.getName().equals("Q1 Android")) {
-                    Log.d(TAG, bluetoothDevice.getName());
-                }
-            }
+        if (bluetoothAdapter.isEnabled()) {
+//            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+//            for (BluetoothDevice bluetoothDevice : pairedDevices) {
+//                if (bluetoothDevice.getName().equals("Q1 Android")) {
+//                    Log.d(TAG, bluetoothDevice.getName());
+//                }
+//            }
+            Thread bluetoothThread = new Thread(new BluetoothRunnable(bluetoothAdapter));
+            bluetoothThread.start();
         }
-
-        Thread bluetoothThread = new Thread(new BluetoothRunnable(bluetoothAdapter));
-        bluetoothThread.start();
     }
 
 
