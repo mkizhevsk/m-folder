@@ -5,18 +5,19 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.mk.m_folder.MainActivity;
+
 import java.io.IOException;
 import java.util.UUID;
 
-public class BluetoothRunnable implements Runnable {
+public class BluetoothServerRunnable implements Runnable {
 
     private final BluetoothServerSocket bluetoothServerSocket;
+    public static boolean running = false;
 
     private static final String TAG = "MainActivity";
 
-    public static boolean running = false;
-
-    public BluetoothRunnable(BluetoothAdapter bluetoothAdapter) {
+    public BluetoothServerRunnable(BluetoothAdapter bluetoothAdapter) {
             // Use a temporary object that is later assigned to bluetoothServerSocket
             // because bluetoothServerSocket is final.
             BluetoothServerSocket tmp = null;
@@ -33,15 +34,15 @@ public class BluetoothRunnable implements Runnable {
     @Override
     public void run() {
             running = true;
-            Log.d(TAG, "bluetooth run start");
+            Log.d(TAG, "bluetooth server run start");
             BluetoothSocket bluetoothSocket = null;
             // Keep listening until exception occurs or a socket is returned.
             while (running) {
                 Log.d(TAG, "start running");
                 try {
-                    Log.d(TAG, "1");
+                    Log.d(TAG, "-1-");
                     bluetoothSocket = bluetoothServerSocket.accept();
-                    Log.d(TAG, "2");
+                    Log.d(TAG, "-2-");
                 } catch (IOException e) {
                     Log.e(TAG, "Socket's accept() method failed", e);
                     break;
@@ -52,11 +53,11 @@ public class BluetoothRunnable implements Runnable {
                     // the connection in a separate thread.
                     Log.d(TAG, "connection was accepted");
 
-                    Thread outputStreamThread = new Thread(new OutputStreamRunnable(bluetoothSocket));
-                    outputStreamThread.start();
-
                     Thread inputStreamThread = new Thread(new InputStreamRunnable(bluetoothSocket));
                     inputStreamThread.start();
+
+                    //Thread outputStreamThread = new Thread(new OutputStreamRunnable(bluetoothSocket, MainActivity.tempInt));
+                    //outputStreamThread.start();
 
                     //bluetoothServerSocket.close();
                     //break;

@@ -12,18 +12,19 @@ public class OutputStreamRunnable implements Runnable {
 
     private static final String TAG = "MainActivity";
 
-    public OutputStreamRunnable(BluetoothSocket bluetoothSocket) {
+    private int tempInt;
+
+    public OutputStreamRunnable(BluetoothSocket bluetoothSocket, int tempInt) {
         this.bluetoothSocket = bluetoothSocket;
+        this.tempInt = tempInt;
     }
 
     @Override
     public void run() {
         try {
             DataOutputStream out = new DataOutputStream(bluetoothSocket.getOutputStream());
-            int intOut = 7;
-            out.writeInt(intOut);
-            Log.e(TAG, "server out: " + intOut);
-            //Integer[] export = {1, 2 , 3};
+            out.writeInt(tempInt);
+            Log.e(TAG, "server out: " + tempInt);
         } catch (IOException e) {
             Log.e(TAG, "sending attempt failed", e);
         }
