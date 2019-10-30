@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,13 +22,11 @@ import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
-import com.mk.m_folder.data.thread.BluetoothClientRunnable;
 import com.mk.m_folder.data.thread.BluetoothServerRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static com.mk.m_folder.data.InOut.tempPath;
 import static com.mk.m_folder.data.Player.allTracks;
@@ -62,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static Handler inOutHandler;
     public static Handler audioProgressHandler = new Handler();
+    public static Handler nextTrackHandler;
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
     private BluetoothAdapter bluetoothAdapter;
     private Thread bluetoothServerThread;
-    private Thread bluetoothClientThread;
     public static int tempInt = 0;
 
     @Override
@@ -121,6 +118,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        nextTrackHandler = new Handler(new Handler.Callback() {
+            public boolean handleMessage(Message message) {
+                player.nextTrack();
+
+                return true;
+            }
+        });
+
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -128,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothServerThread = new Thread(new BluetoothServerRunnable(bluetoothAdapter));
             bluetoothServerThread.start();
         }
+
     }
 
 
@@ -330,21 +336,25 @@ public class MainActivity extends AppCompatActivity {
     public void test() {
         Log.d(TAG, "test");
         tempInt = 10;
-        if (bluetoothAdapter.isEnabled()) {
+        //ConnectedRunnable.outputStreamHandler.sendEmptyMessage(1);
+        /*if (bluetoothAdapter.isEnabled()) {
             Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
             for (BluetoothDevice bluetoothDevice : pairedDevices) {
                 Log.d(TAG, bluetoothDevice.getName());
-                //if (bluetoothDevice.getName().equals("Q1 Android")) {
-                if (bluetoothDevice.getName().equals("ACTOMA ACE")) {
+                if (bluetoothDevice.getName().equals("Q1 Android")) {
+                //if (bluetoothDevice.getName().equals("ACTOMA ACE")) {
                     Log.d(TAG, "  " + bluetoothDevice.getName());
                     bluetoothClientThread = new Thread(new BluetoothClientRunnable(bluetoothDevice));
                     bluetoothClientThread.start();
                     return;
                 }
             }
-        }
+        }*/
+
 
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -361,12 +371,12 @@ public class MainActivity extends AppCompatActivity {
         BluetoothServerRunnable.running = false;
         bluetoothServerThread.interrupt();
 
-        try {
-            bluetoothClientThread.interrupt();
-            Log.d(TAG, "bluetoothClientThread interrupt success!");
-        } catch (Exception e) {
-            Log.d(TAG, "bluetoothClientThread interrupt failure");
-        }
+//        try {
+//            bluetoothClientThread.interrupt();
+//            Log.d(TAG, "bluetoothClientThread interrupt success!");
+//        } catch (Exception e) {
+//            Log.d(TAG, "bluetoothClientThread interrupt failure");
+//        }
 
         player.reset();
 

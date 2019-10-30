@@ -5,8 +5,6 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.mk.m_folder.MainActivity;
-
 import java.io.IOException;
 import java.util.UUID;
 
@@ -40,9 +38,8 @@ public class BluetoothServerRunnable implements Runnable {
             while (running) {
                 Log.d(TAG, "start running");
                 try {
-                    Log.d(TAG, "-1-");
+                    Log.d(TAG, "try to connect..");
                     bluetoothSocket = bluetoothServerSocket.accept();
-                    Log.d(TAG, "-2-");
                 } catch (IOException e) {
                     Log.e(TAG, "Socket's accept() method failed", e);
                     break;
@@ -53,13 +50,10 @@ public class BluetoothServerRunnable implements Runnable {
                     // the connection in a separate thread.
                     Log.d(TAG, "connection was accepted");
 
-                    Thread inputStreamThread = new Thread(new InputStreamRunnable(bluetoothSocket));
-                    inputStreamThread.start();
+                    Thread inputThread = new Thread(new InputRunnable(bluetoothSocket));
+                    inputThread.start();
 
-                    //Thread outputStreamThread = new Thread(new OutputStreamRunnable(bluetoothSocket, MainActivity.tempInt));
-                    //outputStreamThread.start();
-
-                    //bluetoothServerSocket.close();
+                    //cancel();
                     //break;
                 } else {
                     Log.d(TAG, "socket null");
@@ -71,7 +65,7 @@ public class BluetoothServerRunnable implements Runnable {
         try {
             bluetoothServerSocket.close();
         } catch (IOException e) {
-            Log.e(TAG, "Could not close the connect socket", e);
+            Log.e(TAG, "bluetoothServerSocket", e);
         }
     }
 
