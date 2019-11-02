@@ -6,7 +6,9 @@ import android.util.Log;
 
 import com.mk.m_folder.MainActivity;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 public class BluetoothClientRunnable implements Runnable {
@@ -35,6 +37,7 @@ public class BluetoothClientRunnable implements Runnable {
         //bluetoothAdapter.cancelDiscovery();
 
         try {
+            Log.d(TAG, "try to connect..");
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
             bluetoothSocket.connect();
@@ -42,18 +45,27 @@ public class BluetoothClientRunnable implements Runnable {
             // Unable to connect; close the socket and return.
             try {
                 bluetoothSocket.close();
-            } catch (IOException closeException) {
-                Log.e(TAG, "Could not close the client socket", closeException);
+                Log.d(TAG, "bluetoothSocket was closed");
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close bluetoothSocket", e);
             }
             return;
         }
-        Log.d(TAG, "connection attempt succeeded");
+        Log.d(TAG, "client connection success!");
 
-        //Thread inputStreamThread = new Thread(new InputStreamRunnable(bluetoothSocket));
-        //inputStreamThread.start();
+        try {
+            OutputStream outputStream = bluetoothSocket.getOutputStream();
 
-        Thread outputStreamRunnable = new Thread(new OutputStreamRunnable(bluetoothSocket, MainActivity.tempInt));
-        outputStreamRunnable.start();
+            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+
+            dataOutputStream.writeInt(MainActivity.tempInt);
+            Log.e(TAG, "Output: " + MainActivity.tempInt);
+
+            //cancel();
+        } catch (IOException e) {
+            Log.d(TAG, "Error occured when creating output stream");
+            cancel();
+        }
     }
 
     // Closes the client socket and causes the thread to finish.

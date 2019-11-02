@@ -36,7 +36,7 @@ public class BluetoothServerRunnable implements Runnable {
             BluetoothSocket bluetoothSocket = null;
             // Keep listening until exception occurs or a socket is returned.
             while (running) {
-                Log.d(TAG, "start running");
+                //Log.d(TAG, "start running");
                 try {
                     Log.d(TAG, "try to connect..");
                     bluetoothSocket = bluetoothServerSocket.accept();

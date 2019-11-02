@@ -1,8 +1,10 @@
 package com.mk.m_folder.data.thread;
 
+import android.app.Notification;
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.mk.m_folder.MainActivity;
 
@@ -36,9 +38,15 @@ public class InputRunnable implements Runnable {
 
         try {
             DataInputStream in = new DataInputStream(inputStream);
-            int imp = in.readInt();
-            Log.e(TAG, "Input: " + imp);
-            MainActivity.nextTrackHandler.sendEmptyMessage(1);
+            int tempNumber = in.readInt();
+            Log.e(TAG, "Input: " + tempNumber);
+
+            Message message = new Message();
+            Bundle bundle = new Bundle();
+            bundle.putInt("buttonNumber", tempNumber);
+            message.setData(bundle);
+            MainActivity.inputHandler.sendMessage(message);
+
             closeSocket();
         } catch (IOException e) {
             Log.e(TAG, "Input stream was disconnected", e);

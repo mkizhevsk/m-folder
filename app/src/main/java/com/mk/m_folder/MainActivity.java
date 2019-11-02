@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
+import com.mk.m_folder.data.thread.BluetoothClientRunnable;
 import com.mk.m_folder.data.thread.BluetoothServerRunnable;
 
 import java.util.ArrayList;
@@ -59,12 +61,13 @@ public class MainActivity extends AppCompatActivity {
 
     public static Handler inOutHandler;
     public static Handler audioProgressHandler = new Handler();
-    public static Handler nextTrackHandler;
+    public static Handler inputHandler;
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
     private BluetoothAdapter bluetoothAdapter;
     private Thread bluetoothServerThread;
+    private Thread bluetoothClientThread;
     public static int tempInt = 0;
 
     @Override
@@ -118,9 +121,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        nextTrackHandler = new Handler(new Handler.Callback() {
+        inputHandler = new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
-                player.nextTrack();
+                Bundle bundle = message.getData();
+                int buttonNumber = bundle.getInt("buttonNumber");
+                Log.d(TAG, "buttonNumber: " + buttonNumber);
+
+                switch (buttonNumber) {
+                    case 1:
+                        player.previousTrack();
+                        break;
+                    case 2:
+                        player.nextTrack();
+                        break;
+                    case 3:
+                        player.fastForward();
+                        break;
+                    case 4:
+                        player.volumeDown();
+                        break;
+                    case 5:
+                        player.playPause();
+                        break;
+                    case 6:
+                        player.volumeUp();
+                }
 
                 return true;
             }
@@ -304,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
                 player.playPause();
                 break;
             case R.id.btnForward:
-                mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 10000);
+                player.fastForward();
                 break;
         }
     }
@@ -334,27 +359,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void test() {
-        Log.d(TAG, "test");
         tempInt = 10;
-        //ConnectedRunnable.outputStreamHandler.sendEmptyMessage(1);
-        /*if (bluetoothAdapter.isEnabled()) {
-            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-            for (BluetoothDevice bluetoothDevice : pairedDevices) {
-                Log.d(TAG, bluetoothDevice.getName());
-                if (bluetoothDevice.getName().equals("Q1 Android")) {
-                //if (bluetoothDevice.getName().equals("ACTOMA ACE")) {
-                    Log.d(TAG, "  " + bluetoothDevice.getName());
-                    bluetoothClientThread = new Thread(new BluetoothClientRunnable(bluetoothDevice));
-                    bluetoothClientThread.start();
-                    return;
-                }
-            }
-        }*/
-
-
+        if (bluetoothAdapter.isEnabled()) {
+            BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice("0C:35:1B:90:E2:CB");
+            bluetoothClientThread = new Thread(new BluetoothClientRunnable(bluetoothDevice));
+            bluetoothClientThread.start();
+        }
     }
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -368,15 +379,14 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = false;
         InOut.getInstance().savePath(this, tempPath);
 
-        BluetoothServerRunnable.running = false;
-        bluetoothServerThread.interrupt();
+        if(bluetoothServerThread != null) {
+            BluetoothServerRunnable.running = false;
+            bluetoothServerThread.interrupt();
+        }
 
-//        try {
-//            bluetoothClientThread.interrupt();
-//            Log.d(TAG, "bluetoothClientThread interrupt success!");
-//        } catch (Exception e) {
-//            Log.d(TAG, "bluetoothClientThread interrupt failure");
-//        }
+        if(bluetoothClientThread != null) {
+            bluetoothClientThread.interrupt();
+        }
 
         player.reset();
 
@@ -384,3 +394,15 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 }
+
+//Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+//for (BluetoothDevice bluetoothDevice : pairedDevices) {
+//  Log.d(TAG, bluetoothDevice.getName());
+//if (bluetoothDevice.getName().equals("Q1 Android")) {
+//            Log.d(TAG, "" + bluetoothDevice.getAddress());
+
+//if (bluetoothDevice.getName().equals("ACTOMA ACE")) {
+
+//return;
+//  }
+//}

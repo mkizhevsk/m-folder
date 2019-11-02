@@ -240,7 +240,7 @@ public class Player {
     }
 
     // previous track
-    private void previousTrack() {
+    public void previousTrack() {
         if(trackNumber > 0) {
             trackNumber--;
             playSong(playList.get(trackNumber));
@@ -263,6 +263,21 @@ public class Player {
 
             playSong(playList.get(trackNumber));
         }
+    }
+
+    public void fastForward() {
+        mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 10000);
+    }
+
+    public void volumeUp() {
+        audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+//        int musicVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+//        Log.d(TAG, "volume: " + musicVolume);
+//        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 2,);
+    }
+
+    public void volumeDown() {
+        audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND);
     }
 
     // bluetooth events etc.
