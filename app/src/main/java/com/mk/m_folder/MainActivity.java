@@ -25,6 +25,7 @@ import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.BluetoothClientRunnable;
 import com.mk.m_folder.data.thread.BluetoothServerRunnable;
+import com.mk.m_folder.data.thread.ConnectedThread;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -378,6 +379,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         isPlaying = false;
         InOut.getInstance().savePath(this, tempPath);
+
+        ConnectedThread.running = false;
 
         if(bluetoothServerThread != null) {
             BluetoothServerRunnable.running = false;

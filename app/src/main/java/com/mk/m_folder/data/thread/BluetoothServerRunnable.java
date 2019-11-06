@@ -50,8 +50,10 @@ public class BluetoothServerRunnable implements Runnable {
                     // the connection in a separate thread.
                     Log.d(TAG, "connection was accepted");
 
-                    Thread inputThread = new Thread(new InputRunnable(bluetoothSocket));
-                    inputThread.start();
+//                    Thread inputThread = new Thread(new InputRunnable(bluetoothSocket));
+//                    inputThread.start();
+                    Thread thread = new Thread(new ConnectedThread(bluetoothSocket));
+                    thread.start();
 
                     //cancel();
                     //break;
