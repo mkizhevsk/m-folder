@@ -99,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean handleMessage(Message message) {
                 Collections.sort(artists);
                 Log.d(TAG, "artists: " + artists.size());
-                listLevel++;
                 showArtists();
 
                 return true;
@@ -184,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(artists.get(position).getAlbums());
 
                 MainActivity.artistId = position;
-                MainActivity.listLevel++;
                 showAlbums(artists.get(position).getAlbums());
             }
         });
@@ -214,7 +212,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        listLevel++;
+        //Log.d(TAG, "showArtists: " + listLevel);
     }
+
     public void showAlbums(final ArrayList<Album> albums) {
         String[] stringAlbums = new String[albums.size()];
         int i = 0;
@@ -236,12 +238,16 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(albums.get(position).getTracks());
 
                 albumId = position;
-                MainActivity.listLevel++;
                 showSongs(albums.get(position).getTracks());
 
             }
         });
+
+        listLevel++;
+        readyToEnd = false;
+        //Log.d(TAG, "showAlbums: " + listLevel);
     }
+
     public void showSongs(final List<Track> tracks) {
         String[] stringSongs = new String[tracks.size()];
         int i = 0;
@@ -273,10 +279,11 @@ public class MainActivity extends AppCompatActivity {
                 MyArrayAdapter.selectedItemPosition = position;
             }
         });
-    }
 
-    public void playNextTrack(View view) {
-        player.nextTrack();
+        if(listLevel < 3) {
+            listLevel++;
+        }
+        //Log.d(TAG, "showSongs: " + listLevel);
     }
 
     // process back button
@@ -285,12 +292,12 @@ public class MainActivity extends AppCompatActivity {
         //Log.d(TAG, String.valueOf(listLevel));
         if(listLevel == 3) {
             //Log.d(TAG, "3");
-            listLevel--;
+            listLevel = listLevel - 2;
             readyToEnd = false;
             showAlbums(artists.get(artistId).getAlbums());
         } else if(listLevel == 2) {
             //Log.d(TAG, "2");
-            listLevel--;
+            listLevel = listLevel - 2;
             readyToEnd = false;
             showArtists();
         } else if(listLevel == 1) {
@@ -299,6 +306,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(readyToEnd) this.finishAffinity();
+    }
+
+    public void playNextTrack(View view) {
+        player.nextTrack();
     }
 
     // SeekBar
