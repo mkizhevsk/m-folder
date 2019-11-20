@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -11,7 +12,10 @@ import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -37,6 +41,9 @@ public class InOut {
     final String SAVED_PATH = "saved_text";
     public static String tempPath = "/storage/1944-3E26/music";
     //public static String tempPath = "/storage/1944-3E26/Android/data/itunes.android.synctunesultimate/files";
+
+    final String DIR_LINES = "Download";
+    final String FILENAME_SD = "deleted_songs.txt";
 
     private static final String TAG = "InOut";
 
@@ -79,7 +86,7 @@ public class InOut {
             }
             artists.add(new Artist(artistName, albums));
         }
-        Log.d(TAG, "artists: " + String.valueOf(artists.size()));
+        Log.d(TAG, "artists: " + artists.size());
         return artists;
     }
 
@@ -121,6 +128,44 @@ public class InOut {
         }
     }
 
+    public String loadPath(Activity activity) {
+        sPref = activity.getPreferences(MODE_PRIVATE);
+        String savedText = sPref.getString(SAVED_PATH, "");
+        //etText.setText(savedText);
+        //Toast.makeText(this, "Text loaded", Toast.LENGTH_SHORT).show();
+        return  savedText;
+    }
+
+    public void savePath(Activity activity, String path) {
+        sPref = activity.getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sPref.edit();
+        editor.putString(SAVED_PATH, path);
+        editor.commit();
+    }
+
+    public void writeLine(String line) {
+        if (!Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            Log.d(TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
+            return;
+        }
+
+        File sdPath = Environment.getExternalStorageDirectory();
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_LINES);
+        sdPath.mkdirs();
+        File sdFile = new File(sdPath, FILENAME_SD);
+
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(sdFile, true));
+            bw.write(line  + "\n");
+            bw.close();
+            Log.d(TAG, "Файл записан: " + sdFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //
     public boolean checkTagInfo(File file) {
         try {
             mmr.setDataSource(file.getAbsolutePath());
@@ -136,21 +181,6 @@ public class InOut {
         }
 
         return false;
-    }
-
-    public String loadPath(Activity activity) {
-        sPref = activity.getPreferences(MODE_PRIVATE);
-        String savedText = sPref.getString(SAVED_PATH, "");
-        //etText.setText(savedText);
-        //Toast.makeText(this, "Text loaded", Toast.LENGTH_SHORT).show();
-        return  savedText;
-    }
-
-    public void savePath(Activity activity, String path) {
-        sPref = activity.getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = sPref.edit();
-        editor.putString(SAVED_PATH, path);
-        editor.commit();
     }
 
 }

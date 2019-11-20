@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Handler;
 
 import static android.content.Context.AUDIO_SERVICE;
 import static com.mk.m_folder.data.InOut.otherFiles;

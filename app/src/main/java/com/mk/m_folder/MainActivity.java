@@ -27,6 +27,7 @@ import com.mk.m_folder.data.thread.BluetoothClientRunnable;
 import com.mk.m_folder.data.thread.BluetoothServerRunnable;
 import com.mk.m_folder.data.thread.ConnectedThread;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.List;
 import static com.mk.m_folder.data.InOut.tempPath;
 import static com.mk.m_folder.data.Player.allTracks;
 import static com.mk.m_folder.data.Player.artists;
+import static com.mk.m_folder.data.Player.currentTrack;
 import static com.mk.m_folder.data.Player.isPlaying;
 import static com.mk.m_folder.data.Player.mediaPlayer;
 import static com.mk.m_folder.data.Player.playList;
@@ -350,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
     public  boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "path to music");
         menu.add(0, 2, 0, "show incorrect tracks");
-        menu.add(0, 3, 0, "test");
+        menu.add(0, 3, 0, "mark track to delete");
         return super.onCreateOptionsMenu(menu);
     }
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -371,12 +373,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void test() {
-        tempInt = 10;
-        if (bluetoothAdapter.isEnabled()) {
-            BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice("0C:35:1B:90:E2:CB");
-            bluetoothClientThread = new Thread(new BluetoothClientRunnable(bluetoothDevice));
-            bluetoothClientThread.start();
-        }
+        String currentTrackInfo = currentTrack.getArtistName() + ": " + currentTrack.getAlbumName() + " - " + currentTrack.getName();
+        InOut.getInstance().writeLine(currentTrackInfo);
+
+        //File deletedFile = currentTrack.getFile();
+        player.nextTrack();
+        //boolean deleted = deletedFile.delete();
+        //if (deleted) Log.d(TAG, "file was deleted");
     }
 
     @Override
