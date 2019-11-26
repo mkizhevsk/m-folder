@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.mk.m_folder.MainActivity;
+
 import java.io.IOException;
 import java.util.UUID;
 
@@ -57,7 +59,10 @@ public class BluetoothServerRunnable implements Runnable {
 
                     //cancel();
                     //break;
+                    MainActivity.connected = true;
                 } else {
+                    MainActivity.connected = false;
+
                     Log.d(TAG, "socket null");
                 }
             }

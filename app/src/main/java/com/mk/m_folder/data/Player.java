@@ -35,12 +35,14 @@ import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.PlayProgressRunnable;
 import com.mk.m_folder.data.thread.TracksRunnable;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static android.content.Context.AUDIO_SERVICE;
+import static com.mk.m_folder.MainActivity.outputStream;
 import static com.mk.m_folder.data.InOut.otherFiles;
 import static com.mk.m_folder.data.InOut.properFiles;
 import static com.mk.m_folder.data.InOut.tempPath;
@@ -183,7 +185,9 @@ public class Player {
             //Log.d(TAG, "-1-1-2");
             mediaPlayer.reset();
         }
+
         isPlaying = true;
+
         try {
             currentTrack = allTracks.get(trackIndex);
             //Log.d(TAG, "-1-2-1-");
@@ -207,22 +211,24 @@ public class Player {
             }
 
             playAudioProgress.setMax(mediaPlayer.getDuration()/1000);
-        //Log.d(TAG, "-1-3-");
+
+            pause = false;
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    nextTrack();
+                }
+            });
+
+            Thread playProgressThread = new Thread(new PlayProgressRunnable());
+            playProgressThread.start();
+
+            String trackInfo = currentTrack.getName() + " - " + currentTrack.getArtistName();
+            sendTrackInfo(trackInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        pause = false;
-
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                nextTrack();
-            }
-        });
-
-        Thread playProgressThread = new Thread(new PlayProgressRunnable());
-        playProgressThread.start();
     }
 
     // playPause
@@ -384,6 +390,18 @@ public class Player {
             }
         } else {
             Log.d(TAG, "null");
+        }
+    }
+
+    private void sendTrackInfo(String trackInfo) {
+        if(MainActivity.connected) {
+            try {
+                DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+                dataOutputStream.writeUTF(trackInfo);
+                Log.e(TAG, "Output success!");
+            } catch (IOException e) {
+                Log.d(TAG, "Error occurred when sending data");
+            }
         }
     }
 

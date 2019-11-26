@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,11 +22,13 @@ import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
-import com.mk.m_folder.data.thread.BluetoothClientRunnable;
 import com.mk.m_folder.data.thread.BluetoothServerRunnable;
 import com.mk.m_folder.data.thread.ConnectedThread;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
     private Thread bluetoothServerThread;
     private Thread bluetoothClientThread;
     public static int tempInt = 0;
+
+    public static InputStream inputStream;
+    public static OutputStream outputStream;
+    public static boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,12 +160,15 @@ public class MainActivity extends AppCompatActivity {
 
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
 
+        startBluetoothServerThread();
+    }
+
+    public void startBluetoothServerThread() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter.isEnabled()) {
             bluetoothServerThread = new Thread(new BluetoothServerRunnable(bluetoothAdapter));
             bluetoothServerThread.start();
         }
-
     }
 
 
@@ -395,6 +403,24 @@ public class MainActivity extends AppCompatActivity {
         InOut.getInstance().savePath(this, tempPath);
 
         ConnectedThread.running = false;
+
+        if(inputStream != null) {
+            try {
+                inputStream.close();
+                Log.d(TAG, "inputStream was closed");
+            } catch (IOException e) {
+                Log.d(TAG, "Error occurred when closing inputStream");
+            }
+        }
+
+        if(outputStream != null) {
+            try {
+                outputStream.close();
+                Log.d(TAG, "outputStream was closed");
+            } catch (IOException e) {
+                Log.d(TAG, "Error occurred when closing outputStream");
+            }
+        }
 
         if(bluetoothServerThread != null) {
             BluetoothServerRunnable.running = false;

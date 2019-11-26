@@ -8,6 +8,7 @@ import android.util.Log;
 import com.mk.m_folder.MainActivity;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,11 +48,17 @@ public class ConnectedThread extends Thread {
         @Override
         public void run() {
             running = true;
-            //byte[] initialArray = { 0, 1, 2 };
-            //write(initialArray);
 
-            mmBuffer = new byte[1024];
-            int numBytes;
+            MainActivity.inputStream = this.mmInStream;
+            MainActivity.outputStream = this.mmOutStream;
+
+            try {
+                DataOutputStream dataOutputStream = new DataOutputStream(mmOutStream);
+                dataOutputStream.writeUTF("some sending");
+                Log.e(TAG, "Output success!");
+            } catch (IOException e) {
+                Log.d(TAG, "Error occurred when sending data");
+            }
 
             while (running) {
                 try {
@@ -65,9 +72,10 @@ public class ConnectedThread extends Thread {
                     message.setData(bundle);
                     MainActivity.inputHandler.sendMessage(message);
 
-                    //numBytes = mmInStream.read(mmBuffer);
-                    //Log.d(TAG, "something was received");
+                    MainActivity.connected = true;
                 } catch (IOException e) {
+                    MainActivity.connected = false;
+
                     Log.d(TAG, "Input stream was disconnected");
                     try {
                         mmSocket.close();
