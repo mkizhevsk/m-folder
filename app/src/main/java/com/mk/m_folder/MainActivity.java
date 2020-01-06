@@ -25,7 +25,6 @@ import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.BluetoothServerRunnable;
 import com.mk.m_folder.data.thread.ConnectedThread;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
     private Thread bluetoothServerThread;
-    private Thread bluetoothClientThread;
     public static int tempInt = 0;
 
     public static InputStream inputStream;
@@ -93,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         lvMain = findViewById(R.id.list_items);
         lvMain.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        //helper = new Helper(this, this);
         player = new Player(this,this);
 
         if(player.checkPermissions()) {
@@ -244,12 +241,35 @@ public class MainActivity extends AppCompatActivity {
                                     int position, long id) {
                 //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
                 view.setSelected(true);
-
-                Collections.sort(albums.get(position).getTracks());
-
                 albumId = position;
-                showSongs(albums.get(position).getTracks());
 
+                List<Track> albumTracks = albums.get(position).getTracks();
+                Collections.sort(albumTracks);
+                showSongs(albumTracks);
+            }
+        });
+
+        lvMain.setLongClickable(true);
+        lvMain.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+
+                playList.clear();
+
+                List<Track> albumTracks = albums.get(position).getTracks();
+                Collections.sort(albumTracks);
+                for (Track track : albumTracks) {
+                    for (Track thisTrack : allTracks) {
+                        if (track.equals(thisTrack)) {
+                            playList.add(allTracks.indexOf(thisTrack));
+                            break;
+                        }
+                    }
+                }
+
+                trackNumber = 0;
+                player.playSong(playList.get(trackNumber));
+
+                return true;
             }
         });
 
@@ -272,8 +292,9 @@ public class MainActivity extends AppCompatActivity {
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
+                //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
                 view.setSelected(true);
+                MyArrayAdapter.selectedItemPosition = position;
 
                 playList.clear();
                 for(Track track : tracks) {
@@ -286,7 +307,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 trackNumber = position;
                 player.playSong(playList.get(trackNumber));
-                MyArrayAdapter.selectedItemPosition = position;
             }
         });
 
@@ -425,10 +445,6 @@ public class MainActivity extends AppCompatActivity {
         if(bluetoothServerThread != null) {
             BluetoothServerRunnable.running = false;
             bluetoothServerThread.interrupt();
-        }
-
-        if(bluetoothClientThread != null) {
-            bluetoothClientThread.interrupt();
         }
 
         player.reset();
