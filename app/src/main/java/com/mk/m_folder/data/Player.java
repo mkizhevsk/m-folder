@@ -68,7 +68,7 @@ public class Player {
     public static String wrongSongs = "";
 
     public static boolean isPlaying;
-    private   static boolean pause = false;
+    private static boolean pause = false;
 
     private Thread tracksThread;
 

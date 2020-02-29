@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
@@ -379,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
     // top right menu
     public  boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "path to music");
-        menu.add(0, 2, 0, "show incorrect tracks");
+        menu.add(0, 2, 0, "track info");
         menu.add(0, 3, 0, "mark track to delete");
         return super.onCreateOptionsMenu(menu);
     }
@@ -388,9 +389,13 @@ public class MainActivity extends AppCompatActivity {
             case 1: // path to music
                 player.editPath();
                 break;
-            case 2: // show incorrect tracks
+            case 2: // track info
+                String trackInfo = currentTrack.getFile().getAbsolutePath();
+//                Toast.makeText(this, trackInfo, Toast.LENGTH_LONG).show();
+                Log.d(TAG, trackInfo);
                 Intent intent = new Intent(this, ListActivity.class);
-                intent.putExtra("wrongSongs", wrongSongs);
+                intent.putExtra("wrongSongs", trackInfo);
+//                intent.putExtra("wrongSongs", wrongSongs);
                 startActivity(intent);
                 break;
             case 3:
@@ -453,15 +458,3 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 }
-
-//Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-//for (BluetoothDevice bluetoothDevice : pairedDevices) {
-//  Log.d(TAG, bluetoothDevice.getName());
-//if (bluetoothDevice.getName().equals("Q1 Android")) {
-//            Log.d(TAG, "" + bluetoothDevice.getAddress());
-
-//if (bluetoothDevice.getName().equals("ACTOMA ACE")) {
-
-//return;
-//  }
-//}
