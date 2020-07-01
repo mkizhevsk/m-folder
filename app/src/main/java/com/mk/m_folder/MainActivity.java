@@ -16,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
@@ -41,7 +40,6 @@ import static com.mk.m_folder.data.Player.isPlaying;
 import static com.mk.m_folder.data.Player.mediaPlayer;
 import static com.mk.m_folder.data.Player.playList;
 import static com.mk.m_folder.data.Player.trackNumber;
-import static com.mk.m_folder.data.Player.wrongSongs;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -381,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
     public  boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "path to music");
         menu.add(0, 2, 0, "track info");
-        menu.add(0, 3, 0, "mark track to delete");
+        menu.add(0, 3, 0, "delete track");
         return super.onCreateOptionsMenu(menu);
     }
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -399,18 +397,21 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case 3:
-                test();
+                deleteTrack();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void test() {
+    public void deleteTrack() {
         String currentTrackInfo = currentTrack.getArtistName() + ": " + currentTrack.getAlbumName() + " - " + currentTrack.getName();
-        InOut.getInstance().writeLine(currentTrackInfo);
 
+        if(currentTrack.getFile().delete()) {
+            InOut.getInstance().writeLine(currentTrackInfo);
+            player.nextTrack();
+        }
         //File deletedFile = currentTrack.getFile();
-        player.nextTrack();
+
         //boolean deleted = deletedFile.delete();
         //if (deleted) Log.d(TAG, "file was deleted");
     }
