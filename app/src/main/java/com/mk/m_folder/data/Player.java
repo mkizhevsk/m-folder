@@ -105,9 +105,11 @@ public class Player {
             Log.d(TAG, "proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
             Collections.shuffle(properFiles);
 
+            Log.d(TAG, "media exception: 1");
             allTracks.add(new Track(properFiles.get(0), mmr));
+            Log.d(TAG, "media exception: 2");
             playList.add(0);
-
+            Log.d(TAG, "media exception: 3");
             startPlayer();
         } catch (Exception e) {
             Log.d(TAG, "media exception: " + e.toString());
@@ -118,7 +120,7 @@ public class Player {
 
     // start player
     public void startPlayer() {
-        //this.context = context;
+//        Log.d(TAG, "startPlayer");
 
         coverImageView = ((MainActivity)context).findViewById(R.id.coverImage);
         songTextView = ((MainActivity)context).findViewById(R.id.textSong);
@@ -206,7 +208,7 @@ public class Player {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                 coverImageView.setImageBitmap(bitmap); //associated cover art in bitmap
             } else {
-                coverImageView.setImageResource(R.drawable.folder);
+                coverImageView.setImageResource(R.drawable.default_cover);
             }
 
             playAudioProgress.setMax(mediaPlayer.getDuration()/1000);
