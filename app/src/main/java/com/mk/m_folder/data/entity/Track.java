@@ -24,15 +24,11 @@ public class Track implements Comparable<Track> {
 //        this.artistName = names[0];
 //        this.albumName = names[1];
 //        this.name = names[2];
-        this.name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        this.name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) : "неизвестная композиция";
 
-        this.artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+        this.artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) : "неизвестный артист";
 
-        String tempAlbumName = "";
-        if(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) != null) {
-            tempAlbumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-        }
-        this.albumName = tempAlbumName;
+        this.albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) : "разное";
 
         this.number = 0;
         String stringNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
@@ -107,5 +103,9 @@ public class Track implements Comparable<Track> {
         return this.name.equals(that.name)
                 && (this.artistName.equals(that.artistName))
                 && (this.albumName.equals(that.albumName));
+    }
+
+    public String print() {
+        return this.artistName + " - " + this.albumName + " - " + this.name + " - " + this.number;
     }
 }

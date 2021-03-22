@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
 
-        startBluetoothServerThread();
+        //startBluetoothServerThread();
     }
 
     public void startBluetoothServerThread() {

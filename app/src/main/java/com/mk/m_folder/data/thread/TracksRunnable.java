@@ -27,30 +27,16 @@ public class TracksRunnable implements Runnable {
 
         for (File file : properFiles) {
             if (!running) {
-                Log.d(TAG, "return from TracksRunnable1");
+                Log.d(TAG, "return from TracksRunnable");
                 return;
             }
             Track tempTrack = new Track(file, mmr);
+
             allTracks.add(tempTrack);
+
             playList.add(allTracks.indexOf(tempTrack));
         }
         Log.d(TAG, "allTracks before process: " + allTracks.size());
-
-        /*for (File file : otherFiles) {
-            if (!running) {
-                Log.d(TAG, "return from TracksRunnable2");
-                return;
-            }
-            if (InOut.getInstance().checkTagInfo(file)) {
-                Track tempTrack = new Track(file, mmr);
-
-                wrongSongs += tempTrack.getArtistName() + " - " + tempTrack.getAlbumName() + " - " + tempTrack.getName() + "\n";
-                allTracks.add(tempTrack);
-                playList.add(allTracks.indexOf(tempTrack));
-            }
-
-        }
-        Log.d(TAG, "allTracks after process: " + allTracks.size());*/
 
         artists = InOut.getInstance().getArtists(allTracks);
 
