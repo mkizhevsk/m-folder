@@ -1,8 +1,11 @@
 package com.mk.m_folder.data.entity;
 
 import android.media.MediaMetadataRetriever;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import com.mk.m_folder.data.Helper;
 
 import java.io.File;
 
@@ -16,15 +19,18 @@ public class Track implements Comparable<Track> {
 
     int number;
 
-    private static final String TAG = "Track";
+    private static final String TAG = "MainActivity";
 
     public Track(File file, MediaMetadataRetriever mmr) {
+//        Log.d(TAG, "Track");
         mmr.setDataSource(file.getAbsolutePath());
 
-//        this.artistName = names[0];
-//        this.albumName = names[1];
-//        this.name = names[2];
-        this.name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) : "неизвестная композиция";
+        String trackName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        if(trackName != null && !trackName.isEmpty()) {
+            this.name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        } else {
+            this.name = Helper.disableExtension(file.getName()) != null ? Helper.disableExtension(file.getName()) :  "неизвестная композиция";
+        }
 
         this.artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) : "неизвестный артист";
 
@@ -38,7 +44,6 @@ public class Track implements Comparable<Track> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //Log.d(TAG, stringNumber + " - " + String.valueOf(this.number));
         this.setFile(file);
     }
 

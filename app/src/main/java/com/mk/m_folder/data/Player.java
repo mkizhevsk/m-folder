@@ -65,7 +65,7 @@ public class Player {
     private Context context;
     private Activity mainActivity;
 
-    public static String wrongSongs = "";
+//    public static String wrongSongs = "";
 
     public static boolean isPlaying;
     private static boolean pause = false;
@@ -105,11 +105,11 @@ public class Player {
             Log.d(TAG, "proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
             Collections.shuffle(properFiles);
 
-            Log.d(TAG, "media exception: 1");
             allTracks.add(new Track(properFiles.get(0), mmr));
-            Log.d(TAG, "media exception: 2");
+
             playList.add(0);
-            Log.d(TAG, "media exception: 3");
+
+            Log.d(TAG, "start player from getMediaFiles()..");
             startPlayer();
         } catch (Exception e) {
             Log.d(TAG, "media exception: " + e.toString());
@@ -120,8 +120,6 @@ public class Player {
 
     // start player
     public void startPlayer() {
-//        Log.d(TAG, "startPlayer");
-
         coverImageView = ((MainActivity)context).findViewById(R.id.coverImage);
         songTextView = ((MainActivity)context).findViewById(R.id.textSong);
         artistTextView = ((MainActivity)context).findViewById(R.id.textArtist);
@@ -131,8 +129,13 @@ public class Player {
 
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         initMediaSession();
+
         playAudioProgress.setVisibility(ProgressBar.VISIBLE);
+
+        // начинаем играть первый трек
         playSong(0);
+
+        // удаляем первый трек из оставшихся для обработки остальных файлов
         properFiles.remove(0);
 
         // audioFocus
@@ -173,17 +176,13 @@ public class Player {
 
         tracksThread = new Thread(new TracksRunnable());
         tracksThread.start();
-
-        //playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
     // play song by track index
     public void playSong(int trackIndex) {
         if(mediaPlayer == null){
-            //Log.d(TAG, "-1-1-1-");
             mediaPlayer = new MediaPlayer();
         }else{
-            //Log.d(TAG, "-1-1-2");
             mediaPlayer.reset();
         }
 
@@ -191,13 +190,12 @@ public class Player {
 
         try {
             currentTrack = allTracks.get(trackIndex);
-            //Log.d(TAG, "-1-2-1-");
+
             mediaPlayer.setDataSource(currentTrack.getFile().getAbsolutePath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare();
             mediaPlayer.start();
 
-            Log.d(TAG, currentTrack.getName());
             songTextView.setText(currentTrack.getName());
             artistTextView.setText(currentTrack.getArtistName());
             albumTextView.setText(currentTrack.getAlbumName());

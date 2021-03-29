@@ -81,10 +81,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         trackAndListInfo = findViewById(R.id.trackInfo);
-//        coverImageView = findViewById(R.id.coverImage);
-//        songTextView = findViewById(R.id.textSong);
-//        artistTextView = findViewById(R.id.textArtist);
-//        albumTextView = findViewById(R.id.textAlbum);
+
         playAudioProgress = findViewById(R.id.play_audio_seek_bar);
 
         lvMain = findViewById(R.id.list_items);
@@ -95,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         if(player.checkPermissions()) {
             Log.d(TAG, "permission granted by default");
             player.getMediaFiles();
-            Log.d(TAG, String.valueOf(allTracks.size()));
+//            Log.d(TAG, String.valueOf(allTracks.size()));
         }
 
         inOutHandler = new Handler(new Handler.Callback() {
