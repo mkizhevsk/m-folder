@@ -65,12 +65,14 @@ public class Track implements Comparable<Track> {
 
     @Override
     public int compareTo(@NonNull Track track) {
-        if(this.number == track.number) {
-            return 0;
-        } else if(this.number > track.getNumber()) {
-            return 1;
-        }
-        return -1;
+        if(this.number > 0 && track.getNumber() > 0) {
+            if(this.number == track.number) {
+                return 0;
+            } else if(this.number > track.getNumber()) {
+                return 1;
+            }
+            return -1;
+        } else return this.name.compareTo(track.getName());
     }
 
     @Override

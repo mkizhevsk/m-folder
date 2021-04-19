@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
     public void showArtists() {
         String[] stringArtists = new String[artists.size()];
         int i = 0;
+        Collections.sort(artists);
         for(Artist artist : artists) {
             stringArtists[i] = artist.getName();
             i++;
@@ -274,10 +275,10 @@ public class MainActivity extends AppCompatActivity {
         //Log.d(TAG, "showAlbums: " + listLevel);
     }
 
-    public void showSongs(final List<Track> tracks) {
-        String[] stringSongs = new String[tracks.size()];
+    public void showSongs(final List<Track> albumTracks) {
+        String[] stringSongs = new String[albumTracks.size()];
         int i = 0;
-        for(Track track : tracks) {
+        for(Track track : albumTracks) {
             stringSongs[i] = track.getName();
             i++;
         }
@@ -293,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 MyArrayAdapter.selectedItemPosition = position;
 
                 playList.clear();
-                for(Track track : tracks) {
+                for(Track track : albumTracks) {
                     for(Track thisTrack : allTracks) {
                         if(track.equals(thisTrack)) {
                             playList.add(allTracks.indexOf(thisTrack));
