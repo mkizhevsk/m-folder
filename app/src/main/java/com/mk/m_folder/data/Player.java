@@ -89,7 +89,7 @@ public class Player {
     public void getMediaFiles() {
 
         try {
-            Log.d(TAG, "media start");
+            Log.d(TAG, "getMediaFiles()");
             String loadedPath = InOut.getInstance().loadPath(mainActivity);
             if(loadedPath != null && !loadedPath.equals("")) {
                 Log.d(TAG, "just loaded: " + loadedPath);
@@ -105,7 +105,7 @@ public class Player {
             Log.d(TAG, "proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
             Collections.shuffle(properFiles);
 
-            allTracks.add(new Track(properFiles.get(0), mmr));
+            allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
             playList.add(0);
 

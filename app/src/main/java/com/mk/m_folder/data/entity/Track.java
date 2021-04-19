@@ -19,32 +19,8 @@ public class Track implements Comparable<Track> {
 
     int number;
 
-    private static final String TAG = "MainActivity";
-
-    public Track(File file, MediaMetadataRetriever mmr) {
-//        Log.d(TAG, "Track");
-        mmr.setDataSource(file.getAbsolutePath());
-
-        String trackName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-        if(trackName != null && !trackName.isEmpty()) {
-            this.name = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-        } else {
-            this.name = Helper.disableExtension(file.getName()) != null ? Helper.disableExtension(file.getName()) :  "неизвестная композиция";
-        }
-
-        this.artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) : "неизвестный артист";
-
-        this.albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) : "разное";
-
-        this.number = 0;
-        String stringNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
-        try {
-            String[] result = stringNumber.split("/");
-            this.number = Integer.parseInt(result[0]);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.setFile(file);
+    public Track(File file) {
+        this.file = file;
     }
 
     public String getName() {

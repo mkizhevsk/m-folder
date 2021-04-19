@@ -45,9 +45,39 @@ public class InOut {
     final String DIR_LINES = "Download";
     final String FILENAME_SD = "deleted_songs.txt";
 
-    private static final String TAG = "InOut";
+    private static final String TAG = "MainActivity";
 
     public InOut() {
+    }
+
+    public Track getTrackFromFile(File file, MediaMetadataRetriever mmr) {
+        Track track = new Track(file);
+
+        mmr.setDataSource(file.getAbsolutePath());
+        //Log.d(TAG, file.toString());
+
+        String trackName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        if (trackName != null && !trackName.isEmpty()) {
+            track.setName(trackName);
+        } else {
+            track.setName(Helper.disableExtension(file.getName()) != null ? Helper.disableExtension(file.getName()) : "неизвестная композиция");
+        }
+
+        track.setArtistName(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) : "неизвестный артист");
+
+        track.setAlbumName(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) != null ? mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM) : "разное");
+
+        int number = 0;
+        String stringNumber = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
+        try {
+            String[] result = stringNumber.split("/");
+            number = Integer.parseInt(result[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        track.setNumber(number);
+
+        return track;
     }
 
     public List<Artist> getArtists(List<Track> tracks) {

@@ -30,7 +30,7 @@ public class TracksRunnable implements Runnable {
                 Log.d(TAG, "return from TracksRunnable");
                 return;
             }
-            Track tempTrack = new Track(file, mmr);
+            Track tempTrack = InOut.getInstance().getTrackFromFile(file, mmr);
 
             allTracks.add(tempTrack);
 
