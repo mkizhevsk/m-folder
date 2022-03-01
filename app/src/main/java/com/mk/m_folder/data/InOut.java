@@ -154,6 +154,8 @@ public class InOut {
                     getFiles(file.getAbsolutePath());
                 }
             }
+        } else {
+            Log.d(TAG, "there is no access to the music directory");
         }
     }
 
