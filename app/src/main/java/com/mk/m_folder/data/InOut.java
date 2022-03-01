@@ -121,7 +121,7 @@ public class InOut {
     }
 
     public void getSongs(String directoryName) {
-        //Log.d(TAG, "start");
+//        Log.d(TAG, "start");
         properFiles = new ArrayList<>();
         otherFiles = new ArrayList<>();
 
@@ -129,31 +129,30 @@ public class InOut {
     }
 
     private void getFiles(String directoryName) {
-
         File directory = new File(directoryName);
-
         File[] fList = directory.listFiles();
-
-        for (File file : fList) {
-            if (file.isFile()) {
-                Uri uriFile = Uri.fromFile(file);
-                String fileExt = MimeTypeMap.getFileExtensionFromUrl(uriFile.toString());
-                if(fileExt.equals("mp3") || fileExt.equals("m4a")) {
-                    properFiles.add(file);
-                } else {
-                    String filePath = file.getAbsolutePath();
-                    int strLength = filePath.lastIndexOf(".");
-                    if(strLength > 0) {
-                        String tempExt = filePath.substring(strLength + 1).toLowerCase();
-                        if(tempExt.equals("mp3") || tempExt.equals("m4a")) {
-                            properFiles.add(file);
-                            continue;
+        if(fList != null) {
+            for (File file : fList) {
+                if (file.isFile()) {
+                    Uri uriFile = Uri.fromFile(file);
+                    String fileExt = MimeTypeMap.getFileExtensionFromUrl(uriFile.toString());
+                    if(fileExt.equals("mp3") || fileExt.equals("m4a")) {
+                        properFiles.add(file);
+                    } else {
+                        String filePath = file.getAbsolutePath();
+                        int strLength = filePath.lastIndexOf(".");
+                        if(strLength > 0) {
+                            String tempExt = filePath.substring(strLength + 1).toLowerCase();
+                            if(tempExt.equals("mp3") || tempExt.equals("m4a")) {
+                                properFiles.add(file);
+                                continue;
+                            }
                         }
+                        otherFiles.add(file);
                     }
-                    otherFiles.add(file);
+                } else if (file.isDirectory()) {
+                    getFiles(file.getAbsolutePath());
                 }
-            } else if (file.isDirectory()) {
-                getFiles(file.getAbsolutePath());
             }
         }
     }
