@@ -145,8 +145,7 @@ public class Player {
                         if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
                             // Permanent loss of audio focus
                             Log.d(TAG,"AUDIOFOCUS_LOSS");
-                        }
-                        else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
                             Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT");
                             // Pause playback
                             mediaPlayer.pause();
@@ -236,7 +235,7 @@ public class Player {
             mediaPlayer.pause();
             playPause.setText("play");
             pause = true;
-        } else if(!mediaPlayer.isPlaying()) {
+        } else {
             mediaPlayer.start();
             playPause.setText("pause");
             pause = false;
