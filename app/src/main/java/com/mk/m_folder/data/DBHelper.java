@@ -15,7 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private static final String TABLE_DELETION =
-            "create table if not exists contact ("
+            "create table if not exists deletion ("
                     + "id integer primary key autoincrement, "
                     + "track_name text, "
                     + "artist_name text, "

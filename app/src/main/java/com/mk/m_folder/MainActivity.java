@@ -4,9 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
@@ -17,6 +21,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.mk.m_folder.data.BaseService;
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
@@ -52,10 +57,6 @@ public class MainActivity extends AppCompatActivity {
     public static int artistId = 0;
 
     TextView trackAndListInfo;
-//    public ImageView coverImageView;
-//    public TextView songTextView;
-//    public TextView artistTextView;
-//    public TextView albumTextView;
     SeekBar playAudioProgress;
     ListView lvMain;
 
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     public static OutputStream outputStream;
     public static boolean connected = false;
 
+    BaseService baseService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,10 +92,12 @@ public class MainActivity extends AppCompatActivity {
 
         player = new Player(this,this);
 
+        Intent intent = new Intent(this, BaseService.class);
+        bindService(intent, baseServiceConnection, Context.BIND_AUTO_CREATE);
+
         if(player.checkPermissions()) {
             Log.d(TAG, "permission granted by default");
             player.getMediaFiles();
-//            Log.d(TAG, String.valueOf(allTracks.size()));
         }
 
         inOutHandler = new Handler(new Handler.Callback() {
@@ -152,18 +157,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
-
-        //startBluetoothServerThread();
     }
 
-    public void startBluetoothServerThread() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter.isEnabled()) {
-            bluetoothServerThread = new Thread(new BluetoothServerRunnable(bluetoothAdapter));
-            bluetoothServerThread.start();
+    private ServiceConnection baseServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            BaseService.LocalBinder binder = (BaseService.LocalBinder) service;
+            baseService = binder.getService();
+
+            Log.d(TAG, "MainActivity onServiceConnected");
         }
-    }
 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+            Log.d(TAG, "MainActivity onServiceDisconnected");
+        }
+    };
 
     // media content
     public void showArtists() {
@@ -218,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         listLevel++;
-        //Log.d(TAG, "showArtists: " + listLevel);
     }
 
     public void showAlbums(final ArrayList<Album> albums) {
@@ -310,7 +319,6 @@ public class MainActivity extends AppCompatActivity {
         if(listLevel < 3) {
             listLevel++;
         }
-        //Log.d(TAG, "showSongs: " + listLevel);
     }
 
     // process back button
@@ -402,12 +410,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deleteTrack() {
-        String currentTrackInfo = currentTrack.getArtistName() + ": " + currentTrack.getAlbumName() + " - " + currentTrack.getName();
+//        String currentTrackInfo = currentTrack.getArtistName() + ": " + currentTrack.getAlbumName() + " - " + currentTrack.getName();
 
-        if(currentTrack.getFile().delete()) {
-            InOut.getInstance().writeLine(currentTrackInfo);
+//        if(currentTrack.getFile().delete()) {
+            Log.d(TAG, "delete");
+//            InOut.getInstance().writeLine(currentTrackInfo);
+            baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFile().getName());
             player.nextTrack();
-        }
+//        }
         //File deletedFile = currentTrack.getFile();
 
         //boolean deleted = deletedFile.delete();
@@ -453,6 +463,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         player.reset();
+
+        stopService(new Intent(this, BaseService.class));
 
         Log.d(TAG, "finish in MainActivity");
         super.onDestroy();
