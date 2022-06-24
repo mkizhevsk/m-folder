@@ -1,5 +1,11 @@
 package com.mk.m_folder.data;
 
+import static android.content.Context.AUDIO_SERVICE;
+import static com.mk.m_folder.MainActivity.outputStream;
+import static com.mk.m_folder.data.InOut.otherFiles;
+import static com.mk.m_folder.data.InOut.properFiles;
+import static com.mk.m_folder.data.InOut.tempPath;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,12 +45,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static android.content.Context.AUDIO_SERVICE;
-import static com.mk.m_folder.MainActivity.outputStream;
-import static com.mk.m_folder.data.InOut.otherFiles;
-import static com.mk.m_folder.data.InOut.properFiles;
-import static com.mk.m_folder.data.InOut.tempPath;
 
 public class Player {
 

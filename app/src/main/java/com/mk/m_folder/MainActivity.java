@@ -1,7 +1,13 @@
 package com.mk.m_folder;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import static com.mk.m_folder.data.InOut.tempPath;
+import static com.mk.m_folder.data.Player.allTracks;
+import static com.mk.m_folder.data.Player.artists;
+import static com.mk.m_folder.data.Player.currentTrack;
+import static com.mk.m_folder.data.Player.isPlaying;
+import static com.mk.m_folder.data.Player.mediaPlayer;
+import static com.mk.m_folder.data.Player.playList;
+import static com.mk.m_folder.data.Player.trackNumber;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
@@ -21,6 +27,9 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.mk.m_folder.data.BaseService;
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
@@ -36,15 +45,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static com.mk.m_folder.data.InOut.tempPath;
-import static com.mk.m_folder.data.Player.allTracks;
-import static com.mk.m_folder.data.Player.artists;
-import static com.mk.m_folder.data.Player.currentTrack;
-import static com.mk.m_folder.data.Player.isPlaying;
-import static com.mk.m_folder.data.Player.mediaPlayer;
-import static com.mk.m_folder.data.Player.playList;
-import static com.mk.m_folder.data.Player.trackNumber;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -415,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
 //        if(currentTrack.getFile().delete()) {
             Log.d(TAG, "delete");
 //            InOut.getInstance().writeLine(currentTrackInfo);
-            baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFile().getName());
+        baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFile().getName());
             player.nextTrack();
 //        }
         //File deletedFile = currentTrack.getFile();

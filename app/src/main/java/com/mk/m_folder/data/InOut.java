@@ -1,5 +1,7 @@
 package com.mk.m_folder.data;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
@@ -21,8 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class InOut {
 
