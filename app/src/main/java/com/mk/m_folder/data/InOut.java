@@ -39,7 +39,7 @@ public class InOut {
 
     SharedPreferences sPref;
     final String SAVED_PATH = "saved_text";
-    public static String tempPath = "/storage/emulated/0/music";
+    public static String tempPath = "/storage/5E08-92B8/Music";
     //public static String tempPath = "/storage/1944-3E26/Android/data/itunes.android.synctunesultimate/files";
 
     final String DIR_LINES = "Download";

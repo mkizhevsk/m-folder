@@ -9,7 +9,6 @@ import static com.mk.m_folder.data.Player.mediaPlayer;
 import static com.mk.m_folder.data.Player.playList;
 import static com.mk.m_folder.data.Player.trackNumber;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +35,6 @@ import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
-import com.mk.m_folder.data.thread.BluetoothServerRunnable;
 import com.mk.m_folder.data.thread.ConnectedThread;
 
 import java.io.IOException;
@@ -68,13 +66,16 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
-    private BluetoothAdapter bluetoothAdapter;
-    private Thread bluetoothServerThread;
+//    private BluetoothAdapter bluetoothAdapter;
+//    private Thread bluetoothServerThread;
     public static int tempInt = 0;
 
     public static InputStream inputStream;
     public static OutputStream outputStream;
     public static boolean connected = false;
+
+    private String[] settings = {"/storage/5E08-92B8/Music"};
+    private boolean permissionsGrantedByDefault;
 
     BaseService baseService;
 
@@ -92,12 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
         player = new Player(this,this);
 
-        Intent intent = new Intent(this, BaseService.class);
-        bindService(intent, baseServiceConnection, Context.BIND_AUTO_CREATE);
-
+//
         if(player.checkPermissions()) {
             Log.d(TAG, "permission granted by default");
-            player.getMediaFiles();
+//            player.getMediaFiles();
+            startBaseService(true);
         }
 
         inOutHandler = new Handler(new Handler.Callback() {
@@ -159,13 +159,26 @@ public class MainActivity extends AppCompatActivity {
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
+    private void startBaseService(boolean permissionsGrantedByDefault) {
+        this.permissionsGrantedByDefault = permissionsGrantedByDefault;
+        Intent intent = new Intent(this, BaseService.class);
+        bindService(intent, baseServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     private ServiceConnection baseServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             BaseService.LocalBinder binder = (BaseService.LocalBinder) service;
             baseService = binder.getService();
+            Log.d(TAG, "MainActivity baseService onServiceConnected");
 
-            Log.d(TAG, "MainActivity onServiceConnected");
+//            if(player.checkPermissions()) {
+                String dbPath = baseService.getSettings().get(0);
+                Log.d(TAG, "dbPath " + dbPath);
+
+                Log.d(TAG, "permission granted by default");
+                player.getMediaFiles(dbPath);
+//            }
         }
 
         @Override
@@ -427,8 +440,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "permission granted by request");
-        player.getMediaFiles();
-        Log.d(TAG, String.valueOf(allTracks.size()));
+        startBaseService(false);
+
+//        if(baseService != null) {
+//            String dbPath = baseService.getSettings().get(0);
+//
+//            player.getMediaFiles(dbPath);
+//            Log.d(TAG, String.valueOf(allTracks.size()));
+//        }
     }
 
     @Override
@@ -436,6 +455,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy");
         isPlaying = false;
         InOut.getInstance().savePath(this, tempPath);
+        baseService.saveSettings(tempPath);
 
         ConnectedThread.running = false;
 
@@ -457,10 +477,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if(bluetoothServerThread != null) {
-            BluetoothServerRunnable.running = false;
-            bluetoothServerThread.interrupt();
-        }
+//        if(bluetoothServerThread != null) {
+//            BluetoothServerRunnable.running = false;
+//            bluetoothServerThread.interrupt();
+//        }
 
         player.reset();
 

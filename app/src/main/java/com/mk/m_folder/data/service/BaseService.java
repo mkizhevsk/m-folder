@@ -16,6 +16,7 @@ import com.mk.m_folder.data.dto.DeletionDto;
 import com.mk.m_folder.data.entity.Deletion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BaseService extends Service {
@@ -127,7 +128,7 @@ public class BaseService extends Service {
 
     // Setting
     public void saveSettings(String path) {
-        Log.d(TAG, "start saveSettings..");
+        Log.d(TAG, "saveSettings: " + path);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
@@ -137,17 +138,17 @@ public class BaseService extends Service {
         Cursor settingCursor = db.rawQuery(sql,null);
         if(settingCursor.moveToFirst()) { //existed row
             int updCount = db.update(SETTING_TABLE, cv, "id = " + 1, null);
-            Log.d(TAG, "Setting updated rows count  = " + updCount);
+            Log.d(TAG, "  setting updated rows count  = " + updCount);
         } else { // insert a new row
             long rowID = db.insert(SETTING_TABLE, null, cv);
-            Log.d(TAG, "Setting row inserted, ID = " + rowID);
+            Log.d(TAG, "  setting row inserted, ID = " + rowID);
         }
         settingCursor.close();
 
         dbHelper.close();
     }
 
-    public String[] getSettings () {
+    public List<String> getSettings() {
         Log.d(TAG, "start getSettings..");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -165,6 +166,6 @@ public class BaseService extends Service {
         settingCursor.close();
 
         dbHelper.close();
-        return settings;
+        return Arrays.asList(settings);
     }
 }

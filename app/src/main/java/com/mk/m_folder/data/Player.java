@@ -86,16 +86,17 @@ public class Player {
         this.mainActivity = mainActivity;
     }
 
-    public void getMediaFiles() {
+    public void getMediaFiles(String path) {
 
         try {
             Log.d(TAG, "getMediaFiles()");
-            String loadedPath = InOut.getInstance().loadPath(mainActivity);
+//            String loadedPath = InOut.getInstance().loadPath(mainActivity);
+            String loadedPath = path;
             if(loadedPath != null && !loadedPath.equals("")) {
                 Log.d(TAG, "just loaded: " + loadedPath);
                 tempPath = InOut.getInstance().loadPath(mainActivity);
             }
-            Log.d(TAG, "path :" + tempPath);
+//            Log.d(TAG, "path :" + tempPath);
 
             allTracks = new ArrayList<>();
             playList = new ArrayList<>();
