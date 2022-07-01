@@ -30,7 +30,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mk.m_folder.data.BaseService;
+import com.mk.m_folder.data.service.BaseService;
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
