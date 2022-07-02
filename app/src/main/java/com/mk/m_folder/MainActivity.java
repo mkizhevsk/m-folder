@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     public static OutputStream outputStream;
     public static boolean connected = false;
 
-    private String[] settings = {"/storage/5E08-92B8/Music"};
+    List<String> settings = Arrays.asList("/storage/5E08-92B8/Music");
     private boolean permissionsGrantedByDefault;
 
     BaseService baseService;
@@ -173,11 +174,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "MainActivity baseService onServiceConnected");
 
 //            if(player.checkPermissions()) {
-                String dbPath = baseService.getSettings().get(0);
-                Log.d(TAG, "dbPath " + dbPath);
-
-                Log.d(TAG, "permission granted by default");
-                player.getMediaFiles(dbPath);
+            if(permissionsGrantedByDefault) {
+                settings.set(0, baseService.getSettings().get(0));
+                Log.d(TAG, "dbPath " + settings.get(0));
+            }
+//                Log.d(TAG, "permission granted by default");
+                player.getMediaFiles(settings.get(0));
 //            }
         }
 

@@ -151,10 +151,15 @@ public class BaseService extends Service {
     public List<String> getSettings() {
         Log.d(TAG, "start getSettings..");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Log.d(TAG, "2");
+        //SELECT EXISTS(SELECT 1 FROM myTbl WHERE u_tag="tag" LIMIT 1);
+        //String checkSql = "SELECT EXISTS(SELECT 1 FROM " + SETTING_TABLE + " WHERE id=1 LIMIT 1)";
 
         String[] settings = new String[1];
         String sql = "SELECT * FROM "  + SETTING_TABLE;
+        Log.d(TAG, "3");
         Cursor settingCursor = db.rawQuery(sql,null);
+        Log.d(TAG, "4");
         if (settingCursor.moveToFirst()) {
             int pathColIndex = settingCursor.getColumnIndex(MUSIC_PATH_COLUMN);
             settings[0] = settingCursor.getString(pathColIndex);
