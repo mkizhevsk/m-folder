@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -15,6 +16,11 @@ import com.mk.m_folder.data.DBHelper;
 import com.mk.m_folder.data.dto.DeletionDto;
 import com.mk.m_folder.data.entity.Deletion;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +42,7 @@ public class BaseService extends Service {
     private static final String ALBUM_NAME_COLUMN = "album_name";
     private static final String FILE_NAME_COLUMN = "file_name";
 
+    List<String> settings = Arrays.asList("/storage/5E08-92B8/Music");
 
     private static final String TAG = "MainActivity";
 
@@ -151,26 +158,49 @@ public class BaseService extends Service {
     public List<String> getSettings() {
         Log.d(TAG, "start getSettings..");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Log.d(TAG, "2");
-        //SELECT EXISTS(SELECT 1 FROM myTbl WHERE u_tag="tag" LIMIT 1);
-        //String checkSql = "SELECT EXISTS(SELECT 1 FROM " + SETTING_TABLE + " WHERE id=1 LIMIT 1)";
 
         String[] settings = new String[1];
         String sql = "SELECT * FROM "  + SETTING_TABLE;
-        Log.d(TAG, "3");
         Cursor settingCursor = db.rawQuery(sql,null);
-        Log.d(TAG, "4");
         if (settingCursor.moveToFirst()) {
             int pathColIndex = settingCursor.getColumnIndex(MUSIC_PATH_COLUMN);
             settings[0] = settingCursor.getString(pathColIndex);
             Log.d(TAG, "Settings were red");
         } else {
+            saveSettings(this.settings.get(0));
             Log.d(TAG, "Settings: 0 rows");
-            return null;
+            return this.settings;
         }
         settingCursor.close();
 
         dbHelper.close();
         return Arrays.asList(settings);
+    }
+
+    // export
+    public void exportDatabase() {
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+            if (sd.canWrite()) {
+                File currentDB = new File("/data/data/" + getPackageName() +"/databases/", BASE_NAME);
+
+                // todo min level
+                String dateDbName = LocalDate.now() + "_" + BASE_NAME;
+                File backupDB = new File(sd.toString() + "/Download/", dateDbName);
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+                    Log.d(TAG, "database was exported successfully");
+                }
+            } else {
+                Log.d(TAG, "нет доступа к памяти телефона");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
     }
 }

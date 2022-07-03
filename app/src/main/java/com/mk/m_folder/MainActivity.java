@@ -67,15 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
-//    private BluetoothAdapter bluetoothAdapter;
-//    private Thread bluetoothServerThread;
     public static int tempInt = 0;
 
     public static InputStream inputStream;
     public static OutputStream outputStream;
     public static boolean connected = false;
 
-    List<String> settings = Arrays.asList("/storage/5E08-92B8/Music");
     private boolean permissionsGrantedByDefault;
 
     BaseService baseService;
@@ -94,10 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
         player = new Player(this,this);
 
-//
         if(player.checkPermissions()) {
             Log.d(TAG, "permission granted by default");
-//            player.getMediaFiles();
             startBaseService(true);
         }
 
@@ -173,14 +168,9 @@ public class MainActivity extends AppCompatActivity {
             baseService = binder.getService();
             Log.d(TAG, "MainActivity baseService onServiceConnected");
 
-//            if(player.checkPermissions()) {
-            if(permissionsGrantedByDefault) {
-                settings.set(0, baseService.getSettings().get(0));
-                Log.d(TAG, "dbPath " + settings.get(0));
-            }
-//                Log.d(TAG, "permission granted by default");
-                player.getMediaFiles(settings.get(0));
-//            }
+            String tempPath = baseService.getSettings().get(0);
+            Log.d(TAG, "MainActivity baseService tempPath=" + tempPath);
+            player.getMediaFiles(tempPath);
         }
 
         @Override
@@ -341,17 +331,14 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         //Log.d(TAG, String.valueOf(listLevel));
         if(listLevel == 3) {
-            //Log.d(TAG, "3");
             listLevel = listLevel - 2;
             readyToEnd = false;
             showAlbums(artists.get(artistId).getAlbums());
         } else if(listLevel == 2) {
-            //Log.d(TAG, "2");
             listLevel = listLevel - 2;
             readyToEnd = false;
             showArtists();
         } else if(listLevel == 1) {
-            //Log.d(TAG, "1");
             readyToEnd = true;
         }
 
@@ -425,14 +412,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deleteTrack() {
-//        String currentTrackInfo = currentTrack.getArtistName() + ": " + currentTrack.getAlbumName() + " - " + currentTrack.getName();
-
-//        if(currentTrack.getFile().delete()) {
-            Log.d(TAG, "delete");
-//            InOut.getInstance().writeLine(currentTrackInfo);
+        Log.d(TAG, "delete");
         baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFile().getName());
-            player.nextTrack();
-//        }
+        player.nextTrack();
         //File deletedFile = currentTrack.getFile();
 
         //boolean deleted = deletedFile.delete();
@@ -443,13 +425,6 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "permission granted by request");
         startBaseService(false);
-
-//        if(baseService != null) {
-//            String dbPath = baseService.getSettings().get(0);
-//
-//            player.getMediaFiles(dbPath);
-//            Log.d(TAG, String.valueOf(allTracks.size()));
-//        }
     }
 
     @Override
@@ -458,6 +433,7 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = false;
         InOut.getInstance().savePath(this, tempPath);
         baseService.saveSettings(tempPath);
+        baseService.exportDatabase();
 
         ConnectedThread.running = false;
 
@@ -478,11 +454,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Error occurred when closing outputStream");
             }
         }
-
-//        if(bluetoothServerThread != null) {
-//            BluetoothServerRunnable.running = false;
-//            bluetoothServerThread.interrupt();
-//        }
 
         player.reset();
 

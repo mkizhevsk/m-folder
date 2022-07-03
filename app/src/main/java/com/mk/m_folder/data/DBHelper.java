@@ -25,19 +25,24 @@ public class DBHelper extends SQLiteOpenHelper {
                     + "album_name text, "
                     + "file_name text" + ");";
 
+    private static final String TABLE_SETTING =
+            "create table if not exists setting ("
+                    + "id integer primary key autoincrement, "
+                    + "music_path text" + ");";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "--- onCreate database ---");
 
         // создаем таблицу, если ее нет
         db.execSQL(TABLE_DELETION);
+        db.execSQL(TABLE_SETTING);
         Log.d(TAG, "--- onCreate database finish ---");
     }
 
     @Override
     public  void onOpen(SQLiteDatabase database) {
         Log.d(TAG, "--- onOpen database ---");
-//        database.execSQL(TABLE_CARD);
 
         super.onOpen((database));
         if(Build.VERSION.SDK_INT >= 28) {

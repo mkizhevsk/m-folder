@@ -39,8 +39,7 @@ public class InOut {
 
     SharedPreferences sPref;
     final String SAVED_PATH = "saved_text";
-    public static String tempPath = "/storage/5E08-92B8/Music";
-    //public static String tempPath = "/storage/1944-3E26/Android/data/itunes.android.synctunesultimate/files";
+    public static String tempPath = "/storage/5E08-92B8/Music2";
 
     final String DIR_LINES = "Download";
     final String FILENAME_SD = "deleted_songs.txt";
@@ -155,7 +154,7 @@ public class InOut {
                 }
             }
         } else {
-            Log.d(TAG, "there is no access to the music directory");
+            Log.d(TAG, "InOut getFiles() there is no access to the music directory");
         }
     }
 

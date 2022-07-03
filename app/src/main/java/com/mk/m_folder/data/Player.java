@@ -89,31 +89,26 @@ public class Player {
     public void getMediaFiles(String path) {
 
         try {
-            Log.d(TAG, "getMediaFiles()");
-//            String loadedPath = InOut.getInstance().loadPath(mainActivity);
-            String loadedPath = path;
-            if(loadedPath != null && !loadedPath.equals("")) {
-                Log.d(TAG, "just loaded: " + loadedPath);
-                tempPath = InOut.getInstance().loadPath(mainActivity);
-            }
-//            Log.d(TAG, "path :" + tempPath);
+            Log.d(TAG, "start getMediaFiles");
+
+            tempPath = path;
 
             allTracks = new ArrayList<>();
             playList = new ArrayList<>();
             mmr = new MediaMetadataRetriever();
 
             InOut.getInstance().getSongs(tempPath);
-            Log.d(TAG, "proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
+            Log.d(TAG, "getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
             Collections.shuffle(properFiles);
 
             allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
             playList.add(0);
 
-            Log.d(TAG, "start player from getMediaFiles()..");
+            Log.d(TAG, "getMediaFiles start player..");
             startPlayer();
         } catch (Exception e) {
-            Log.d(TAG, "media exception: " + e.toString());
+            Log.d(TAG, "getMediaFiles media exception: " + e.toString());
             e.printStackTrace();
             editPath();
         }
@@ -293,7 +288,7 @@ public class Player {
                 mediaSession.setActive(true);
             }
 
-            @Override
+            /*@Override
             public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
                 //Log.d(TAG, "onMediaButtonEvent called: " + mediaButtonIntent);
                 KeyEvent keyEvent = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
@@ -310,7 +305,7 @@ public class Player {
                     }
                 }
                 return super.onMediaButtonEvent(mediaButtonIntent);
-            }
+            }*/
 
             @Override
             public void onSkipToNext() {
@@ -343,6 +338,7 @@ public class Player {
                             public void onClick(DialogInterface dialog, int id) {
                                 tempPath = pathInput.getText().toString();
                                 Log.d(TAG, "from input: " + tempPath);
+                                if(properFiles.isEmpty()) getMediaFiles(tempPath);
                             }
                         })
                 .setNegativeButton("Отмена",
