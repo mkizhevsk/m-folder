@@ -13,7 +13,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.mk.m_folder.data.DBHelper;
-import com.mk.m_folder.data.dto.DeletionDto;
 import com.mk.m_folder.data.entity.Deletion;
 
 import java.io.File;

@@ -29,19 +29,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mk.m_folder.data.service.BaseService;
+import com.mk.m_folder.data.Helper;
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
+import com.mk.m_folder.data.service.BaseService;
 import com.mk.m_folder.data.thread.ConnectedThread;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         player = new Player(this,this);
 
-        if(player.checkPermissions()) {
+        if(Helper.checkPermissions(this, this)) {
             Log.d(TAG, "permission granted by default");
             startBaseService(true);
         }
