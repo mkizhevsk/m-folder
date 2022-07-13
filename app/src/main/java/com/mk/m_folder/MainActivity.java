@@ -34,7 +34,6 @@ import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.service.BaseService;
-import com.mk.m_folder.data.thread.ConnectedThread;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,7 +94,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // load and organize the artists then show them
-        inOutHandler = new Handler(new Handler.Callback() {
+        inOutHandler = getInOutHandler();
+
+        // show updated playAudioProgress every 1 second
+        audioProgressHandler = getAudioProgressHandler();
+
+        playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
+    }
+
+    // handlers
+    private Handler getInOutHandler() {
+        return new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
                 Collections.sort(artists);
                 Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
@@ -104,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
 
-        // show updated playAudioProgress every 1 second
-        audioProgressHandler = new Handler(new Handler.Callback() {
+    private Handler getAudioProgressHandler() {
+        return new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
                 if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
                     if (mediaPlayer != null) {
@@ -121,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-        playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
     // BaseService
@@ -406,8 +414,6 @@ public class MainActivity extends AppCompatActivity {
 //        InOut.getInstance().savePath(this, tempPath);
         baseService.saveSettings(Player.tempPath);
         baseService.exportDatabase();
-
-        ConnectedThread.running = false;
 
         if(inputStream != null) {
             try {
