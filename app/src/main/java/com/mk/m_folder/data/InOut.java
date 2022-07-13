@@ -1,12 +1,7 @@
 package com.mk.m_folder.data;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -14,10 +9,7 @@ import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,14 +27,7 @@ public class InOut {
     static public ArrayList<File> properFiles;
     static public ArrayList<File> otherFiles;
 
-    MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-
-    SharedPreferences sPref;
-    final String SAVED_PATH = "saved_text";
-    public static String tempPath = "/storage/5E08-92B8/Music2";
-
-    final String DIR_LINES = "Download";
-    final String FILENAME_SD = "deleted_songs.txt";
+//    public static String tempPath = "/storage/5E08-92B8/Music2";
 
     private static final String TAG = "MainActivity";
 
@@ -80,6 +65,7 @@ public class InOut {
     }
 
     public List<Artist> getArtists(List<Track> tracks) {
+        Log.d(TAG, "start InOut getArtists()");
         HashSet<String> artistNames = new HashSet<>();
         for(Track track : tracks) {
             artistNames.add(track.getArtistName());
@@ -120,7 +106,7 @@ public class InOut {
     }
 
     public void getSongs(String directoryName) {
-//        Log.d(TAG, "start");
+        Log.d(TAG, "start InOut getSongs()");
         properFiles = new ArrayList<>();
         otherFiles = new ArrayList<>();
 
@@ -156,61 +142,6 @@ public class InOut {
         } else {
             Log.d(TAG, "InOut getFiles() there is no access to the music directory");
         }
-    }
-
-    public String loadPath(Activity activity) {
-        sPref = activity.getPreferences(MODE_PRIVATE);
-        String savedText = sPref.getString(SAVED_PATH, "");
-        //etText.setText(savedText);
-        //Toast.makeText(this, "Text loaded", Toast.LENGTH_SHORT).show();
-        return  savedText;
-    }
-
-    public void savePath(Activity activity, String path) {
-        sPref = activity.getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = sPref.edit();
-        editor.putString(SAVED_PATH, path);
-        editor.commit();
-    }
-
-    public void writeLine(String line) {
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            Log.d(TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return;
-        }
-
-        File sdPath = Environment.getExternalStorageDirectory();
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_LINES);
-        sdPath.mkdirs();
-        File sdFile = new File(sdPath, FILENAME_SD);
-
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(sdFile, true));
-            bw.write(line  + "\n");
-            bw.close();
-            Log.d(TAG, "Файл записан: " + sdFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //
-    public boolean checkTagInfo(File file) {
-        try {
-            mmr.setDataSource(file.getAbsolutePath());
-
-            String tempArtistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            String tempSongName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-
-            if(tempArtistName != null && tempSongName != null) {
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
 }

@@ -41,7 +41,7 @@ public class BaseService extends Service {
     private static final String ALBUM_NAME_COLUMN = "album_name";
     private static final String FILE_NAME_COLUMN = "file_name";
 
-    List<String> settings = Arrays.asList("/storage/5E08-92B8/Music");
+    List<String> settings = Arrays.asList("/storage/5E08-92B8/Music2");
 
     private static final String TAG = "MainActivity";
 

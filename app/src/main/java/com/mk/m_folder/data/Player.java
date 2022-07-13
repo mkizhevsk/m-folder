@@ -1,17 +1,12 @@
 package com.mk.m_folder.data;
 
 import static android.content.Context.AUDIO_SERVICE;
-import static com.mk.m_folder.MainActivity.outputStream;
 import static com.mk.m_folder.data.InOut.otherFiles;
 import static com.mk.m_folder.data.InOut.properFiles;
-import static com.mk.m_folder.data.InOut.tempPath;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -28,9 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import com.mk.m_folder.MainActivity;
 import com.mk.m_folder.R;
 import com.mk.m_folder.data.entity.Artist;
@@ -38,7 +30,6 @@ import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.PlayProgressRunnable;
 import com.mk.m_folder.data.thread.TracksRunnable;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +52,8 @@ public class Player {
     private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
     private Context context;
-    private Activity mainActivity;
+
+    public static String tempPath = "/storage/5E08-92B8/Music2";
 
 //    public static String wrongSongs = "";
 
@@ -79,16 +71,13 @@ public class Player {
 
     public static Track currentTrack;
 
-    public Player(Context context, Activity mainActivity) {
+    public Player(Context context) {
         this.context = context;
-        this.mainActivity = mainActivity;
     }
 
     public void getMediaFiles(String path) {
-
+        Log.d(TAG, "start Player getMediaFiles()");
         try {
-            Log.d(TAG, "start getMediaFiles");
-
             tempPath = path;
 
             allTracks = new ArrayList<>();
@@ -96,17 +85,16 @@ public class Player {
             mmr = new MediaMetadataRetriever();
 
             InOut.getInstance().getSongs(tempPath);
-            Log.d(TAG, "getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
+            Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
             Collections.shuffle(properFiles);
 
             allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
             playList.add(0);
 
-            Log.d(TAG, "getMediaFiles start player..");
             startPlayer();
         } catch (Exception e) {
-            Log.d(TAG, "getMediaFiles media exception: " + e.toString());
+            Log.d(TAG, "Player getMediaFiles media exception: " + e.toString());
             e.printStackTrace();
             editPath();
         }
@@ -114,6 +102,8 @@ public class Player {
 
     // start player
     public void startPlayer() {
+        Log.d(TAG, "start Player startPlayer()");
+
         coverImageView = ((MainActivity)context).findViewById(R.id.coverImage);
         songTextView = ((MainActivity)context).findViewById(R.id.textSong);
         artistTextView = ((MainActivity)context).findViewById(R.id.textArtist);
@@ -216,8 +206,8 @@ public class Player {
             Thread playProgressThread = new Thread(new PlayProgressRunnable());
             playProgressThread.start();
 
-            String trackInfo = currentTrack.getName() + " - " + currentTrack.getArtistName();
-            sendTrackInfo(trackInfo);
+//            String trackInfo = currentTrack.getName() + " - " + currentTrack.getArtistName();
+//            sendTrackInfo(trackInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -386,17 +376,17 @@ public class Player {
         }
     }
 
-    private void sendTrackInfo(String trackInfo) {
-        if(MainActivity.connected) {
-            try {
-                DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-                dataOutputStream.writeUTF(trackInfo);
-                Log.e(TAG, "Output success!");
-            } catch (IOException e) {
-                Log.d(TAG, "Error occurred when sending data");
-            }
-        }
-    }
+//    private void sendTrackInfo(String trackInfo) {
+//        if(MainActivity.connected) {
+//            try {
+//                DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+//                dataOutputStream.writeUTF(trackInfo);
+//                Log.e(TAG, "Output success!");
+//            } catch (IOException e) {
+//                Log.d(TAG, "Error occurred when sending data");
+//            }
+//        }
+//    }
 
 
 }

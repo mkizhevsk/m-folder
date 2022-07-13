@@ -1,6 +1,5 @@
 package com.mk.m_folder;
 
-import static com.mk.m_folder.data.InOut.tempPath;
 import static com.mk.m_folder.data.Player.allTracks;
 import static com.mk.m_folder.data.Player.artists;
 import static com.mk.m_folder.data.Player.currentTrack;
@@ -30,7 +29,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.mk.m_folder.data.Helper;
-import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
@@ -89,23 +87,25 @@ public class MainActivity extends AppCompatActivity {
         lvMain = findViewById(R.id.list_items);
         lvMain.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        player = new Player(this,this);
+        player = new Player(this);
 
         if(Helper.checkPermissions(this, this)) {
             Log.d(TAG, "permission granted by default");
             startBaseService(true);
         }
 
+        // load and organize the artists then show them
         inOutHandler = new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
                 Collections.sort(artists);
-                Log.d(TAG, "artists: " + artists.size());
+                Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
                 showArtists();
 
                 return true;
             }
         });
 
+        // show updated playAudioProgress every 1 second
         audioProgressHandler = new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
                 if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
@@ -122,41 +122,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        inputHandler = new Handler(new Handler.Callback() {
-            public boolean handleMessage(Message message) {
-                Bundle bundle = message.getData();
-                int buttonNumber = bundle.getInt("buttonNumber");
-                Log.d(TAG, "buttonNumber: " + buttonNumber);
-
-                switch (buttonNumber) {
-                    case 1:
-                        player.previousTrack();
-                        break;
-                    case 2:
-                        player.nextTrack();
-                        break;
-                    case 3:
-                        player.fastForward();
-                        break;
-                    case 4:
-                        player.volumeDown();
-                        break;
-                    case 5:
-                        player.playPause();
-                        break;
-                    case 6:
-                        player.volumeUp();
-                }
-
-                return true;
-            }
-        });
-
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
+    // BaseService
     private void startBaseService(boolean permissionsGrantedByDefault) {
         this.permissionsGrantedByDefault = permissionsGrantedByDefault;
+
         Intent intent = new Intent(this, BaseService.class);
         bindService(intent, baseServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -176,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
 
-            Log.d(TAG, "MainActivity onServiceDisconnected");
+            Log.d(TAG, "MainActivity baseService onBaseServiceDisconnected");
         }
     };
 
@@ -431,8 +403,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         isPlaying = false;
-        InOut.getInstance().savePath(this, tempPath);
-        baseService.saveSettings(tempPath);
+//        InOut.getInstance().savePath(this, tempPath);
+        baseService.saveSettings(Player.tempPath);
         baseService.exportDatabase();
 
         ConnectedThread.running = false;
