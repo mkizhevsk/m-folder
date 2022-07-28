@@ -60,17 +60,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static Handler inOutHandler;
     public static Handler audioProgressHandler = new Handler();
-    public static Handler inputHandler;
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
-    public static int tempInt = 0;
-
     public static InputStream inputStream;
     public static OutputStream outputStream;
-    public static boolean connected = false;
-
-    private boolean permissionsGrantedByDefault;
 
     BaseService baseService;
 
@@ -90,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(Helper.checkPermissions(this, this)) {
             Log.d(TAG, "permission granted by default");
-            startBaseService(true);
+            startBaseService();
         }
 
         // load and organize the artists then show them
@@ -134,9 +128,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // BaseService
-    private void startBaseService(boolean permissionsGrantedByDefault) {
-        this.permissionsGrantedByDefault = permissionsGrantedByDefault;
-
+    private void startBaseService() {
+        Log.d(TAG, "MainActivity startBaseService()");
         Intent intent = new Intent(this, BaseService.class);
         bindService(intent, baseServiceConnection, Context.BIND_AUTO_CREATE);
     }
@@ -404,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "permission granted by request");
-        startBaseService(false);
+        startBaseService();
     }
 
     @Override
