@@ -44,18 +44,17 @@ public class Player {
 
     private static final String TAG = "MainActivity";
 
-    public static AudioManager audioManager;
     public static MediaPlayer mediaPlayer;
-    public static MediaSession mediaSession;
-    public static AudioManager.OnAudioFocusChangeListener afChangeListener;
+
+    private AudioManager audioManager;
+    private MediaSession mediaSession;
+    private AudioManager.OnAudioFocusChangeListener afChangeListener;
 
     private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
-    private Context context;
+    private final Context context;
 
     public static String tempPath = "/storage/5E08-92B8/Music2";
-
-//    public static String wrongSongs = "";
 
     public static boolean isPlaying;
     private static boolean pause = false;
@@ -206,8 +205,6 @@ public class Player {
             Thread playProgressThread = new Thread(new PlayProgressRunnable());
             playProgressThread.start();
 
-//            String trackInfo = currentTrack.getName() + " - " + currentTrack.getArtistName();
-//            sendTrackInfo(trackInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -375,18 +372,4 @@ public class Player {
             Log.d(TAG, "null");
         }
     }
-
-//    private void sendTrackInfo(String trackInfo) {
-//        if(MainActivity.connected) {
-//            try {
-//                DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-//                dataOutputStream.writeUTF(trackInfo);
-//                Log.e(TAG, "Output success!");
-//            } catch (IOException e) {
-//                Log.d(TAG, "Error occurred when sending data");
-//            }
-//        }
-//    }
-
-
 }

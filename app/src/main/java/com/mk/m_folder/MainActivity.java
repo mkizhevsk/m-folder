@@ -411,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         isPlaying = false;
-//        InOut.getInstance().savePath(this, tempPath);
+
         baseService.saveSettings(Player.tempPath);
         baseService.exportDatabase();
 
