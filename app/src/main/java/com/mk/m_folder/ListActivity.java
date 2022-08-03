@@ -11,12 +11,12 @@ public class ListActivity extends Activity {
     @Override
     public void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
+        setContentView(R.layout.activity_text);
 
         Intent intent = getIntent();
-        String wrongSongsText = intent.getStringExtra("wrongSongs");
+        String wrongSongsText = intent.getStringExtra("content");
 
-        TextView textView = findViewById(R.id.wrongSongs);
+        TextView textView = findViewById(R.id.textField);
         textView.setMovementMethod(new ScrollingMovementMethod());
         textView.setText(wrongSongsText);
     }

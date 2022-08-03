@@ -7,7 +7,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:id="@+id/wrongSongs"
+        android:id="@+id/textField"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:inputType="textMultiLine"

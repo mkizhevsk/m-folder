@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
     BaseService baseService;
 
+    public static String newline = System.getProperty("line.separator");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -361,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
         menu.add(0, 1, 0, "path to music");
         menu.add(0, 2, 0, "track info");
         menu.add(0, 3, 0, "delete track");
+        menu.add(0, 4, 0, "show deleted tracks");
         return super.onCreateOptionsMenu(menu);
     }
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -373,12 +376,19 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(this, trackInfo, Toast.LENGTH_LONG).show();
                 Log.d(TAG, trackInfo);
                 Intent intent = new Intent(this, ListActivity.class);
-                intent.putExtra("wrongSongs", trackInfo);
-//                intent.putExtra("wrongSongs", wrongSongs);
+                intent.putExtra("content", trackInfo);
                 startActivity(intent);
                 break;
             case 3:
                 deleteTrack();
+                break;
+            case 4:
+                String deletedTracksInfo = "Some text about track" + newline +
+                        "Some text about track 2";
+                Log.d(TAG, deletedTracksInfo);
+                Intent deletedIntent = new Intent(this, ListActivity.class);
+                deletedIntent.putExtra("content", deletedTracksInfo);
+                startActivity(deletedIntent);
                 break;
         }
         return super.onOptionsItemSelected(item);
