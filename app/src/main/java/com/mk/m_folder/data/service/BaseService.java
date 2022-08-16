@@ -132,6 +132,17 @@ public class BaseService extends Service {
         return deletions;
     }
 
+    public int clearDeletions() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        int delCount = db.delete(DELETION_TABLE, "1", null);
+        Log.d(TAG, "deleted deletions rows count = " + delCount);
+
+        dbHelper.close();
+
+        return delCount;
+    }
+
     // Setting
     public void saveSettings(String path) {
         Log.d(TAG, "saveSettings: " + path);

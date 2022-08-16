@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +42,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
     public static OutputStream outputStream;
 
     BaseService baseService;
-
-    public static String newline = System.getProperty("line.separator");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -364,6 +364,7 @@ public class MainActivity extends AppCompatActivity {
         menu.add(0, 2, 0, "track info");
         menu.add(0, 3, 0, "delete track");
         menu.add(0, 4, 0, "show deleted tracks");
+        menu.add(0, 5, 0, "clear deleted tracks");
         return super.onCreateOptionsMenu(menu);
     }
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -383,12 +384,18 @@ public class MainActivity extends AppCompatActivity {
                 deleteTrack();
                 break;
             case 4:
-                String deletedTracksInfo = "Some text about track" + newline +
-                        "Some text about track 2";
+                String deletedTracksInfo = Helper.getDeletedTracksInfo(baseService.getDeletions());
                 Log.d(TAG, deletedTracksInfo);
                 Intent deletedIntent = new Intent(this, ListActivity.class);
                 deletedIntent.putExtra("content", deletedTracksInfo);
                 startActivity(deletedIntent);
+                break;
+            case 5:
+                int clearedDeletions = baseService.clearDeletions();
+                Toast.makeText(this, String.format(Locale.ENGLISH,
+                        "%d deleted tracks was cleared",
+                        clearedDeletions),
+                        Toast.LENGTH_LONG).show();
                 break;
         }
         return super.onOptionsItemSelected(item);

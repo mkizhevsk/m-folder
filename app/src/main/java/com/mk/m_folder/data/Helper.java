@@ -8,10 +8,25 @@ import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.mk.m_folder.data.entity.Deletion;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Helper {
+
+    public static String getDeletedTracksInfo(List<Deletion> deletions) {
+        String deletedTracksInfo = "";
+        for(Deletion deletion : deletions) {
+            StringBuilder sb = new StringBuilder();
+            deletedTracksInfo = sb.append(deletedTracksInfo).append(getNewLine()).append(deletion.getFullInfo()).toString();
+        }
+        return deletedTracksInfo;
+    }
+
+    private static String getNewLine() {
+        return System.getProperty("line.separator");
+    }
 
     public static String disableExtension (String str) {
         // Handle null case specially.
