@@ -10,6 +10,10 @@ public class Deletion {
     public Deletion() {
     }
 
+    public String getFullInfo() {
+        return trackName + " - " + artistName + " - " + fileName + " : " + fileName;
+    }
+
     public String getTrackName() {
         return trackName;
     }
