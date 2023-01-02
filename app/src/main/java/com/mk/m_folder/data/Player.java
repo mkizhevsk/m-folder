@@ -7,6 +7,7 @@ import static com.mk.m_folder.data.InOut.properFiles;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -14,6 +15,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -273,9 +275,9 @@ public class Player {
                 mediaSession.setActive(true);
             }
 
-            /*@Override
+            @Override
             public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-                //Log.d(TAG, "onMediaButtonEvent called: " + mediaButtonIntent);
+                Log.d(TAG, "onMediaButtonEvent called: " + mediaButtonIntent);
                 KeyEvent keyEvent = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                 if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                     int keyCode = keyEvent.getKeyCode();
@@ -290,7 +292,7 @@ public class Player {
                     }
                 }
                 return super.onMediaButtonEvent(mediaButtonIntent);
-            }*/
+            }
 
             @Override
             public void onSkipToNext() {
