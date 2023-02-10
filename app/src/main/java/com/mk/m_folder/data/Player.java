@@ -30,6 +30,7 @@ import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.PlayProgressRunnable;
 import com.mk.m_folder.data.thread.TracksRunnable;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +88,12 @@ public class Player {
             Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
             Collections.shuffle(properFiles);
 
-            allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
+            String filePath = properFiles.get(0).getAbsolutePath();
+            Log.d(TAG, "getAbsolutePath: " + filePath);
+            File file = new File(filePath);
+
+//            allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
+            allTracks.add(InOut.getInstance().getTrackFromFile(file, mmr));
 
             playList.add(0);
 

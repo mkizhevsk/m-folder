@@ -1,11 +1,6 @@
 package com.mk.m_folder.data.entity;
 
-import android.media.MediaMetadataRetriever;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-
-import com.mk.m_folder.data.Helper;
 
 import java.io.File;
 
@@ -14,6 +9,7 @@ public class Track implements Comparable<Track> {
     private String name;
     private String artistName;
     private String albumName;
+    private String filePath;
 
     File file;
 
@@ -45,6 +41,14 @@ public class Track implements Comparable<Track> {
 
     public void setAlbumName(String albumName) {
         this.albumName = albumName;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public int getNumber() {
