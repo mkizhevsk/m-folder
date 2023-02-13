@@ -27,6 +27,7 @@ import com.mk.m_folder.MainActivity;
 import com.mk.m_folder.R;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
+import com.mk.m_folder.data.service.BaseService;
 import com.mk.m_folder.data.thread.PlayProgressRunnable;
 import com.mk.m_folder.data.thread.TracksRunnable;
 
@@ -77,9 +78,12 @@ public class Player {
         this.context = context;
     }
 
-    public void initPlayer (String path, List<Track> dbTracks) {
+    private BaseService baseService;
+
+    public void initPlayer (String path, List<Track> dbTracks, BaseService baseService) {
         Log.d(TAG, "start Player initPlayer()");
         this.dbTracks = dbTracks;
+        this.baseService = baseService;
         getMediaFiles(path);
     }
 
@@ -94,16 +98,15 @@ public class Player {
             Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
 
             if (checkTracks()) {
-                Collections.shuffle(dbTracks);
                 allTracks = dbTracks;
+                MainActivity.showArtistsHandler.sendEmptyMessage(1);
             } else {
-                Collections.shuffle(properFiles);
+//                Collections.shuffle(properFiles);
                 allTracks = new ArrayList<>();
                 allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
                 // удаляем первый трек из оставшихся для обработки остальных файлов
                 properFiles.remove(0);
-
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
             }
@@ -112,27 +115,34 @@ public class Player {
 //            File tempFile = new File(filePath);
 //            allTracks.add(InOut.getInstance().getTrackFromFile(tempFile, mmr));
 
-            playList.add(0);
-
+            playList.add(allTracks.get(0).getId());
             startPlayer();
         } catch (Exception e) {
-            Log.d(TAG, "Player getMediaFiles media exception: " + e.toString());
+            Log.d(TAG, "Player getMediaFiles media exception: " + e);
             e.printStackTrace();
             editPath();
         }
     }
 
+    private void startFirstTrack() {
+
+    }
+
     private boolean checkTracks() {
-        int trackIndex = 0;
         boolean theSame = false;
-        for (File file : properFiles) {
-            if(file.getAbsolutePath().equals(dbTracks.get(trackIndex).getFilePath())) {
-                theSame = true;
-            } else {
-                return false;
+        if(dbTracks.size() > 0) {
+            int trackIndex = 0;
+
+            for (File file : properFiles) {
+                if(file.getAbsolutePath().equals(dbTracks.get(trackIndex).getFilePath())) {
+                    theSame = true;
+                } else {
+                    return false;
+                }
+                trackIndex++;
             }
-            trackIndex++;
         }
+
         return theSame;
     }
 
@@ -153,29 +163,27 @@ public class Player {
         playAudioProgress.setVisibility(ProgressBar.VISIBLE);
 
         // начинаем играть первый трек
-        playSong(0);
+        playSong(playList.get(0));
 
         // audioFocus
         afChangeListener =
-                new AudioManager.OnAudioFocusChangeListener() {
-                    public void onAudioFocusChange(int focusChange) {
-                        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                            // Permanent loss of audio focus
-                            Log.d(TAG,"AUDIOFOCUS_LOSS");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                            Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT");
-                            // Pause playback
-                            mediaPlayer.pause();
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                            // Lower the volume, keep playing
-                            Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                            // Your app has been granted audio focus again
-                            // Raise volume to normal, restart playback if necessary
-                            Log.d(TAG,"AUDIOFOCUS_GAIN");
-                            if(!pause) {
-                                mediaPlayer.start();
-                            }
+                focusChange -> {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        // Permanent loss of audio focus
+                        Log.d(TAG,"AUDIOFOCUS_LOSS");
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                        Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT");
+                        // Pause playback
+                        mediaPlayer.pause();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                        // Lower the volume, keep playing
+                        Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        // Your app has been granted audio focus again
+                        // Raise volume to normal, restart playback if necessary
+                        Log.d(TAG,"AUDIOFOCUS_GAIN");
+                        if(!pause) {
+                            mediaPlayer.start();
                         }
                     }
                 };
@@ -192,7 +200,7 @@ public class Player {
     }
 
     // play song by track index
-    public void playSong(int trackIndex) {
+    public void playSong(int trackId) {
         if(mediaPlayer == null){
             mediaPlayer = new MediaPlayer();
         }else{
@@ -202,9 +210,9 @@ public class Player {
         isPlaying = true;
 
         try {
-            currentTrack = allTracks.get(trackIndex);
+            currentTrack = baseService.getTrack(trackId);
 
-            mediaPlayer.setDataSource(currentTrack.getFile().getAbsolutePath());
+            mediaPlayer.setDataSource(currentTrack.getFilePath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare();
             mediaPlayer.start();
@@ -226,12 +234,7 @@ public class Player {
 
             pause = false;
 
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    nextTrack();
-                }
-            });
+            mediaPlayer.setOnCompletionListener(mp -> nextTrack());
 
             Thread playProgressThread = new Thread(new PlayProgressRunnable());
             playProgressThread.start();

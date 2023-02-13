@@ -6,6 +6,7 @@ import java.io.File;
 
 public class Track implements Comparable<Track> {
 
+    private int id;
     private String name;
     private String artistName;
     private String albumName;
@@ -16,6 +17,14 @@ public class Track implements Comparable<Track> {
     private int number;
 
     public Track() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Track(File file) {

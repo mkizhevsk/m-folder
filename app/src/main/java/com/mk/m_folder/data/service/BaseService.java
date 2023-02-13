@@ -39,6 +39,7 @@ public class BaseService extends Service {
     private static final String DELETION_TABLE = "deletion";
     private static final String SETTING_TABLE = "setting";
 
+    private static final String TRACK_ID_COLUMN = "id";
     private static final String TRACK_NAME_COLUMN = "track_name";
     private static final String ARTIST_NAME_COLUMN = "artist_name";
     private static final String ALBUM_NAME_COLUMN = "album_name";
@@ -80,6 +81,15 @@ public class BaseService extends Service {
     }
 
     // Track
+    public Track getTrack(int trackId) {
+        Log.d(TAG, "start getTrack " + trackId);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Cursor trackCursor = db.rawQuery("SELECT * FROM " + TRACK_TABLE + " WHERE id = " + trackId, null);
+
+        return getTracksByCursor(trackCursor).get(0);
+    }
+
     public void insertTrack(String trackName, String artistName, String albumName, String filePath) {
         Log.d(TAG, "start insertTrack..");
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -98,23 +108,34 @@ public class BaseService extends Service {
         dbHelper.close();
     }
 
-    private List<Track> getTrackByCursor(Cursor trackCursor) {
+    private int[] getColumnIndexes(Cursor trackCursor) {
+        return new int[]{
+                trackCursor.getColumnIndex(TRACK_ID_COLUMN),
+                trackCursor.getColumnIndex(TRACK_NAME_COLUMN),
+                trackCursor.getColumnIndex(ARTIST_NAME_COLUMN),
+                trackCursor.getColumnIndex(ALBUM_NAME_COLUMN),
+                trackCursor.getColumnIndex(FILE_PATH_COLUMN)};
+    }
+
+    private Track getTrackFromCursor(Cursor trackCursor) {
+        int[] columnIndexes = getColumnIndexes(trackCursor);
+
+        Track track = new Track();
+        track.setId(trackCursor.getInt(columnIndexes[0]));
+        track.setName(trackCursor.getString(columnIndexes[1]));
+        track.setAlbumName(trackCursor.getString(columnIndexes[2]));
+        track.setAlbumName(trackCursor.getString(columnIndexes[3]));
+        track.setFilePath(trackCursor.getString(columnIndexes[4]));
+
+        return track;
+    }
+
+    private List<Track> getTracksByCursor(Cursor trackCursor) {
         List<Track> tracks = new ArrayList<>();
 
         if (trackCursor.moveToFirst()) {
-            int trackNameColIndex = trackCursor.getColumnIndex(TRACK_NAME_COLUMN);
-            int artistNameColIndex = trackCursor.getColumnIndex(ARTIST_NAME_COLUMN);
-            int albumNameColIndex = trackCursor.getColumnIndex(ALBUM_NAME_COLUMN);
-            int filePathColIndex = trackCursor.getColumnIndex(FILE_PATH_COLUMN);
-
             do {
-                Track track = new Track();
-                track.setName(trackCursor.getString(trackNameColIndex));
-                track.setAlbumName(trackCursor.getString(artistNameColIndex));
-                track.setAlbumName(trackCursor.getString(albumNameColIndex));
-                track.setFilePath(trackCursor.getString(filePathColIndex));
-
-                tracks.add(track);
+                tracks.add(getTrackFromCursor(trackCursor));
             } while (trackCursor.moveToNext());
 
         } else Log.d(TAG, "0 track rows");
@@ -128,7 +149,7 @@ public class BaseService extends Service {
 
         Cursor trackCursor = db.query(TRACK_TABLE, null, null, null, null, null, null);
 
-        List<Track> tracks = getTrackByCursor(trackCursor);
+        List<Track> tracks = getTracksByCursor(trackCursor);
 
         trackCursor.close();
 

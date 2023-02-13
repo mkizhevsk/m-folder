@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
     int albumId = 0;
 
     public static Handler inOutHandler;
-    public static Handler audioProgressHandler = new Handler();
+    public static Handler audioProgressHandler;
+    public static Handler showArtistsHandler;
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
@@ -95,37 +96,48 @@ public class MainActivity extends AppCompatActivity {
         // show updated playAudioProgress every 1 second
         audioProgressHandler = getAudioProgressHandler();
 
+        // showArtists
+        showArtistsHandler = getShowArtistsHandler();
+
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
     // handlers
     private Handler getInOutHandler() {
-        return new Handler(new Handler.Callback() {
-            public boolean handleMessage(Message message) {
-                Collections.sort(artists);
-                Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
-                showArtists();
+        return new Handler(message -> {
+            Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
 
-                return true;
-            }
+            // записываем в БД треки
+
+            // показываем исполнителей
+            showArtists();
+
+            return true;
         });
     }
 
     private Handler getAudioProgressHandler() {
-        return new Handler(new Handler.Callback() {
-            public boolean handleMessage(Message message) {
-                if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
-                    if (mediaPlayer != null) {
-                        if(isPlaying) {
-                            int currentProgress = mediaPlayer.getCurrentPosition() / 1000;
-                            playAudioProgress.setProgress(currentProgress);
-                            trackAndListInfo.setText((trackNumber + 1) + " из " + playList.size());
-                        }
+        return new Handler(message -> {
+            if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
+                if (mediaPlayer != null) {
+                    if(isPlaying) {
+                        int currentProgress = mediaPlayer.getCurrentPosition() / 1000;
+                        playAudioProgress.setProgress(currentProgress);
+                        trackAndListInfo.setText((trackNumber + 1) + " из " + playList.size());
                     }
                 }
-
-                return true;
             }
+
+            return true;
+        });
+    }
+
+    private Handler getShowArtistsHandler() {
+        return new Handler(message -> {
+            Log.d(TAG, "MainActivity getShowArtistsHandler");
+            showArtists();
+
+            return true;
         });
     }
 
@@ -149,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             List<Track> tracks = baseService.getTracks();
             Log.d(TAG, "MainActivity baseService getTracks=" + tracks.size());
 
-            player.initPlayer(tempPath, tracks);
+            player.initPlayer(tempPath, tracks, baseService);
         }
 
         @Override
@@ -161,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
     // media content
     public void showArtists() {
+        Collections.sort(artists);
         String[] stringArtists = new String[artists.size()];
         int i = 0;
         Collections.sort(artists);
