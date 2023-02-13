@@ -11,9 +11,12 @@ public class Track implements Comparable<Track> {
     private String albumName;
     private String filePath;
 
-    File file;
+    private File file;
 
-    int number;
+    private int number;
+
+    public Track() {
+    }
 
     public Track(File file) {
         this.file = file;

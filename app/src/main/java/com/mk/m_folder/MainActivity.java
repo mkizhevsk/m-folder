@@ -48,15 +48,15 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    Player player;
+    private Player player;
 
     public static int listLevel = 0;
     public static boolean readyToEnd = true;
     public static int artistId = 0;
 
-    TextView trackAndListInfo;
-    SeekBar playAudioProgress;
-    ListView lvMain;
+    private TextView trackAndListInfo;
+    private SeekBar playAudioProgress;
+    private ListView lvMain;
 
     int albumId = 0;
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     public static InputStream inputStream;
     public static OutputStream outputStream;
 
-    BaseService baseService;
+    private BaseService baseService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +145,11 @@ public class MainActivity extends AppCompatActivity {
 
             String tempPath = baseService.getSettings().get(0);
             Log.d(TAG, "MainActivity baseService tempPath=" + tempPath);
-            player.getMediaFiles(tempPath);
+
+            List<Track> tracks = baseService.getTracks();
+            Log.d(TAG, "MainActivity baseService getTracks=" + tracks.size());
+
+            player.initPlayer(tempPath, tracks);
         }
 
         @Override

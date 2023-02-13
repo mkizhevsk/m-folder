@@ -43,6 +43,8 @@ public class Player {
     public static List<Artist> artists;
     public static int trackNumber = 0;
 
+    private List<Track> dbTracks;
+
     private static final String TAG = "MainActivity";
 
     public static MediaPlayer mediaPlayer;
@@ -75,25 +77,40 @@ public class Player {
         this.context = context;
     }
 
+    public void initPlayer (String path, List<Track> dbTracks) {
+        Log.d(TAG, "start Player initPlayer()");
+        this.dbTracks = dbTracks;
+        getMediaFiles(path);
+    }
+
     public void getMediaFiles(String path) {
         Log.d(TAG, "start Player getMediaFiles()");
         try {
             tempPath = path;
-
-            allTracks = new ArrayList<>();
             playList = new ArrayList<>();
             mmr = new MediaMetadataRetriever();
 
             InOut.getInstance().getSongs(tempPath);
             Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
-            Collections.shuffle(properFiles);
 
-            String filePath = properFiles.get(0).getAbsolutePath();
-            Log.d(TAG, "getAbsolutePath: " + filePath);
-            File file = new File(filePath);
+            if (checkTracks()) {
+                Collections.shuffle(dbTracks);
+                allTracks = dbTracks;
+            } else {
+                Collections.shuffle(properFiles);
+                allTracks = new ArrayList<>();
+                allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
-//            allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
-            allTracks.add(InOut.getInstance().getTrackFromFile(file, mmr));
+                // удаляем первый трек из оставшихся для обработки остальных файлов
+                properFiles.remove(0);
+
+                tracksThread = new Thread(new TracksRunnable());
+                tracksThread.start();
+            }
+//            String filePath = properFiles.get(0).getAbsolutePath();
+//            Log.d(TAG, "getAbsolutePath: " + filePath);
+//            File tempFile = new File(filePath);
+//            allTracks.add(InOut.getInstance().getTrackFromFile(tempFile, mmr));
 
             playList.add(0);
 
@@ -103,6 +120,20 @@ public class Player {
             e.printStackTrace();
             editPath();
         }
+    }
+
+    private boolean checkTracks() {
+        int trackIndex = 0;
+        boolean theSame = false;
+        for (File file : properFiles) {
+            if(file.getAbsolutePath().equals(dbTracks.get(trackIndex).getFilePath())) {
+                theSame = true;
+            } else {
+                return false;
+            }
+            trackIndex++;
+        }
+        return theSame;
     }
 
     // start player
@@ -123,9 +154,6 @@ public class Player {
 
         // начинаем играть первый трек
         playSong(0);
-
-        // удаляем первый трек из оставшихся для обработки остальных файлов
-        properFiles.remove(0);
 
         // audioFocus
         afChangeListener =
@@ -161,9 +189,6 @@ public class Player {
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Log.d(TAG, "AUDIOFOCUS_REQUEST_GRANTED");
         }
-
-        tracksThread = new Thread(new TracksRunnable());
-        tracksThread.start();
     }
 
     // play song by track index

@@ -17,6 +17,14 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, BASE_NAME, null, 1);
     }
 
+    private static final String TABLE_TRACK =
+            "create table if not exists track ("
+                    + "id integer primary key autoincrement, "
+                    + "track_name text, "
+                    + "artist_name text, "
+                    + "album_name text, "
+                    + "file_path text" + ");";
+
     private static final String TABLE_DELETION =
             "create table if not exists deletion ("
                     + "id integer primary key autoincrement, "
@@ -35,6 +43,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.d(TAG, "--- onCreate database ---");
 
         // создаем таблицу, если ее нет
+        db.execSQL(TABLE_TRACK);
         db.execSQL(TABLE_DELETION);
         db.execSQL(TABLE_SETTING);
         Log.d(TAG, "--- onCreate database finish ---");
