@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.mk.m_folder.data.DBHelper;
 import com.mk.m_folder.data.entity.Deletion;
+import com.mk.m_folder.data.entity.Track;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,13 +33,18 @@ public class BaseService extends Service {
 
     private static final String BASE_NAME = "my_music.db";
 
-    private static final String DELETION_TABLE = "deletion";
     private static final String MUSIC_PATH_COLUMN = "music_path";
 
+    private static final String TRACK_TABLE = "track";
+    private static final String DELETION_TABLE = "deletion";
     private static final String SETTING_TABLE = "setting";
+
+    private static final String TRACK_ID_COLUMN = "id";
     private static final String TRACK_NAME_COLUMN = "track_name";
     private static final String ARTIST_NAME_COLUMN = "artist_name";
     private static final String ALBUM_NAME_COLUMN = "album_name";
+
+    private static final String FILE_PATH_COLUMN = "file_path";
     private static final String FILE_NAME_COLUMN = "file_name";
 
     List<String> settings = Arrays.asList("/storage/5E08-92B8/Music2");
@@ -72,6 +78,95 @@ public class BaseService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
+    }
+
+    // Track
+    public Track getTrack(int trackId) {
+        Log.d(TAG, "start getTrack " + trackId);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Cursor trackCursor = db.rawQuery("SELECT * FROM " + TRACK_TABLE + " WHERE id = " + trackId, null);
+
+        return getTracksByCursor(trackCursor).get(0);
+    }
+
+    public void insertTrack(String trackName, String artistName, String albumName, String filePath) {
+        Log.d(TAG, "start insertTrack..");
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(TRACK_NAME_COLUMN, trackName);
+        cv.put(ARTIST_NAME_COLUMN, artistName);
+        cv.put(ALBUM_NAME_COLUMN, albumName);
+        cv.put(FILE_PATH_COLUMN, filePath);
+
+        long rowID = db.insert(TRACK_TABLE, null, cv);
+
+        Log.d(TAG, "Track row inserted, ID = " + rowID);
+
+        dbHelper.close();
+    }
+
+    private int[] getColumnIndexes(Cursor trackCursor) {
+        return new int[]{
+                trackCursor.getColumnIndex(TRACK_ID_COLUMN),
+                trackCursor.getColumnIndex(TRACK_NAME_COLUMN),
+                trackCursor.getColumnIndex(ARTIST_NAME_COLUMN),
+                trackCursor.getColumnIndex(ALBUM_NAME_COLUMN),
+                trackCursor.getColumnIndex(FILE_PATH_COLUMN)};
+    }
+
+    private Track getTrackFromCursor(Cursor trackCursor) {
+        int[] columnIndexes = getColumnIndexes(trackCursor);
+
+        Track track = new Track();
+        track.setId(trackCursor.getInt(columnIndexes[0]));
+        track.setName(trackCursor.getString(columnIndexes[1]));
+        track.setAlbumName(trackCursor.getString(columnIndexes[2]));
+        track.setAlbumName(trackCursor.getString(columnIndexes[3]));
+        track.setFilePath(trackCursor.getString(columnIndexes[4]));
+
+        return track;
+    }
+
+    private List<Track> getTracksByCursor(Cursor trackCursor) {
+        List<Track> tracks = new ArrayList<>();
+
+        if (trackCursor.moveToFirst()) {
+            do {
+                tracks.add(getTrackFromCursor(trackCursor));
+            } while (trackCursor.moveToNext());
+
+        } else Log.d(TAG, "0 track rows");
+
+        return tracks;
+    }
+
+    public List<Track> getTracks() {
+        Log.d(TAG, "start getTracks");
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Cursor trackCursor = db.query(TRACK_TABLE, null, null, null, null, null, null);
+
+        List<Track> tracks = getTracksByCursor(trackCursor);
+
+        trackCursor.close();
+
+        dbHelper.close();
+
+        return tracks;
+    }
+
+    public int clearTracks() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        int delCount = db.delete(TRACK_TABLE, "1", null);
+        Log.d(TAG, "deleted tracks rows count = " + delCount);
+
+        dbHelper.close();
+
+        return delCount;
     }
 
     // Deletion
