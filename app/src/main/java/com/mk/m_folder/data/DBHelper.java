@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.util.Log;
 
-import com.mk.m_folder.R;
-
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String BASE_NAME = "my_music.db";

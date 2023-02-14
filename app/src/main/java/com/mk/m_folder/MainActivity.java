@@ -102,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
     private Handler getInOutHandler() {
         return new Handler(new Handler.Callback() {
             public boolean handleMessage(Message message) {
+                baseService.clearTracks();
+                for (Track track : allTracks) {
+                    baseService.insertTrack(track.getName(), track.getArtistName(), track.getAlbumName(), track.getFile().getAbsolutePath());
+                }
+
                 Collections.sort(artists);
                 Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
                 showArtists();
@@ -423,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = false;
 
         baseService.saveSettings(Player.tempPath);
-        //baseService.exportDatabase();
+        baseService.exportDatabase();
 
         if(inputStream != null) {
             try {

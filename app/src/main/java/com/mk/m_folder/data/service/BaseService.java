@@ -120,14 +120,12 @@ public class BaseService extends Service {
     private Track getTrackFromCursor(Cursor trackCursor) {
         int[] columnIndexes = getColumnIndexes(trackCursor);
 
-        Track track = new Track();
-        track.setId(trackCursor.getInt(columnIndexes[0]));
-        track.setName(trackCursor.getString(columnIndexes[1]));
-        track.setAlbumName(trackCursor.getString(columnIndexes[2]));
-        track.setAlbumName(trackCursor.getString(columnIndexes[3]));
-        track.setFilePath(trackCursor.getString(columnIndexes[4]));
-
-        return track;
+        return new Track(
+                trackCursor.getString(columnIndexes[1]),
+                trackCursor.getString(columnIndexes[2]),
+                trackCursor.getString(columnIndexes[3]),
+                trackCursor.getString(columnIndexes[4])
+        );
     }
 
     private List<Track> getTracksByCursor(Cursor trackCursor) {
