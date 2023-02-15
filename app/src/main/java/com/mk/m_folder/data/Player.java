@@ -1,8 +1,6 @@
 package com.mk.m_folder.data;
 
 import static android.content.Context.AUDIO_SERVICE;
-import static com.mk.m_folder.data.InOut.otherFiles;
-import static com.mk.m_folder.data.InOut.properFiles;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -32,6 +30,7 @@ import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.PlayProgressRunnable;
 import com.mk.m_folder.data.thread.TracksRunnable;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +75,8 @@ public class Player {
         this.context = context;
     }
 
+    public static List<File> properFiles;
+
     public void getMediaFiles(String path) {
         Log.d(TAG, "start Player getMediaFiles()");
         try {
@@ -85,8 +86,12 @@ public class Player {
             playList = new ArrayList<>();
             mmr = new MediaMetadataRetriever();
 
-            if(InOut.getInstance().getSongs(tempPath)) {
-                Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
+            StorageFiles storageFiles = InOut.getInstance().getStorageFiles(tempPath);
+            if(storageFiles != null && !storageFiles.getProperFiles().isEmpty()) {
+                properFiles = storageFiles.getProperFiles();
+                List<File> otherFiles = storageFiles.getOtherFiles();
+
+                Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; total: " + (properFiles.size() + otherFiles.size()) );
                 Collections.shuffle(properFiles);
 
                 allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
@@ -328,7 +333,7 @@ public class Player {
                             public void onClick(DialogInterface dialog, int id) {
                                 tempPath = pathInput.getText().toString();
                                 Log.d(TAG, "from input: " + tempPath);
-                                if(properFiles.isEmpty()) getMediaFiles(tempPath);
+                                if(properFiles == null || properFiles.isEmpty()) getMediaFiles(tempPath);
                             }
                         })
                 .setNegativeButton("Отмена",

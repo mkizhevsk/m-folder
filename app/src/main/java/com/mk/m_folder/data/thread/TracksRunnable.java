@@ -9,10 +9,10 @@ import com.mk.m_folder.data.entity.Track;
 
 import java.io.File;
 
-import static com.mk.m_folder.data.InOut.properFiles;
 import static com.mk.m_folder.data.Player.allTracks;
 import static com.mk.m_folder.data.Player.playList;
 import static com.mk.m_folder.data.Player.artists;
+import static com.mk.m_folder.data.Player.properFiles;
 
 public class TracksRunnable implements Runnable {
 

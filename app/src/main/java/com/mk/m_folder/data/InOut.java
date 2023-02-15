@@ -24,8 +24,8 @@ public class InOut {
         return ourInstance;
     }
 
-    static public ArrayList<File> properFiles;
-    static public ArrayList<File> otherFiles;
+    private List<File> properFiles;
+    private List<File> otherFiles;
 
 //    public static String tempPath = "/storage/5E08-92B8/Music2";
 
@@ -105,12 +105,16 @@ public class InOut {
         return artists;
     }
 
-    public boolean getSongs(String directoryName) {
+    public StorageFiles getStorageFiles(String directoryName) {
         Log.d(TAG, "start InOut getSongs()");
         properFiles = new ArrayList<>();
         otherFiles = new ArrayList<>();
 
-        return getFiles(directoryName);
+        if(getFiles(directoryName)) {
+            return new StorageFiles(properFiles, otherFiles);
+        }
+
+        return null;
     }
 
     private boolean getFiles(String directoryName) {

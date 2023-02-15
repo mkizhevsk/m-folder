@@ -451,6 +451,9 @@ public class MainActivity extends AppCompatActivity {
         player.reset();
 
         stopService(new Intent(this, BaseService.class));
+        if (baseServiceConnection != null) {
+            unbindService(baseServiceConnection);
+        }
 
         Log.d(TAG, "finish in MainActivity");
         super.onDestroy();
