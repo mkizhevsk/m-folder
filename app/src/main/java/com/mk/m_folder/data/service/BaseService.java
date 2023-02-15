@@ -81,13 +81,15 @@ public class BaseService extends Service {
     }
 
     // Track
-    public Track getTrack(int trackId) {
-        Log.d(TAG, "start getTrack " + trackId);
+    public Track getTrackByFilePath(String filePath) {
+        Log.d(TAG, "start getTrackByFilePath " + filePath);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor trackCursor = db.rawQuery("SELECT * FROM " + TRACK_TABLE + " WHERE id = " + trackId, null);
+        Cursor trackCursor = db.rawQuery("SELECT * FROM " + TRACK_TABLE + " WHERE file_path = " + filePath, null);
 
-        return getTracksByCursor(trackCursor).get(0);
+        List<Track> tracks = getTracksByCursor(trackCursor);
+        if(tracks.size() > 0) return tracks.get(0);
+        return null;
     }
 
     public void insertTrack(String trackName, String artistName, String albumName, String filePath) {
