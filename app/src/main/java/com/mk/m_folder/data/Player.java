@@ -85,15 +85,18 @@ public class Player {
             playList = new ArrayList<>();
             mmr = new MediaMetadataRetriever();
 
-            InOut.getInstance().getSongs(tempPath);
-            Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
-            Collections.shuffle(properFiles);
+            if(InOut.getInstance().getSongs(tempPath)) {
+                Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; " + (properFiles.size() + otherFiles.size()) );
+                Collections.shuffle(properFiles);
 
-            allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
+                allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
-            playList.add(0);
+                playList.add(0);
 
-            startPlayer();
+                startPlayer();
+            } else {
+                editPath();
+            }
         } catch (Exception e) {
             Log.d(TAG, "Player getMediaFiles media exception: " + e.toString());
             e.printStackTrace();

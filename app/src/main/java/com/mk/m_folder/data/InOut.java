@@ -105,15 +105,15 @@ public class InOut {
         return artists;
     }
 
-    public void getSongs(String directoryName) {
+    public boolean getSongs(String directoryName) {
         Log.d(TAG, "start InOut getSongs()");
         properFiles = new ArrayList<>();
         otherFiles = new ArrayList<>();
 
-        getFiles(directoryName);
+        return getFiles(directoryName);
     }
 
-    private void getFiles(String directoryName) {
+    private boolean getFiles(String directoryName) {
         File directory = new File(directoryName);
         File[] fList = directory.listFiles();
         if(fList != null) {
@@ -139,8 +139,10 @@ public class InOut {
                     getFiles(file.getAbsolutePath());
                 }
             }
+            return true;
         } else {
             Log.d(TAG, "InOut getFiles() there is no access to the music directory");
+            return false;
         }
     }
 
