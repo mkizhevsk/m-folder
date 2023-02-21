@@ -1,6 +1,13 @@
 package com.mk.m_folder.data.thread;
 
+import static com.mk.m_folder.data.Player.allTracks;
+import static com.mk.m_folder.data.Player.artists;
+import static com.mk.m_folder.data.Player.playList;
+import static com.mk.m_folder.data.Player.properFiles;
+
 import android.media.MediaMetadataRetriever;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 
 import com.mk.m_folder.MainActivity;
@@ -8,11 +15,6 @@ import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.entity.Track;
 
 import java.io.File;
-
-import static com.mk.m_folder.data.Player.allTracks;
-import static com.mk.m_folder.data.Player.playList;
-import static com.mk.m_folder.data.Player.artists;
-import static com.mk.m_folder.data.Player.properFiles;
 
 public class TracksRunnable implements Runnable {
 
@@ -30,11 +32,14 @@ public class TracksRunnable implements Runnable {
                 Log.d(TAG, "return from TracksRunnable");
                 return;
             }
-            Track tempTrack = InOut.getInstance().getTrackFromFile(file, mmr);
 
-            allTracks.add(tempTrack);
+            Track track = InOut.getInstance().getTrackFromFile(file, mmr);
+            if(track != null) {
+                allTracks.add(track);
+                playList.add(allTracks.indexOf(track));
 
-            playList.add(allTracks.indexOf(tempTrack));
+                MainActivity.trackInfoHandler.sendMessage(getTrackInfoHandlerMessage(track));
+            }
         }
         Log.d(TAG, "allTracks before process: " + allTracks.size());
 
@@ -43,5 +48,15 @@ public class TracksRunnable implements Runnable {
         MainActivity.inOutHandler.sendEmptyMessage(1);
 
         Log.d(TAG, "TrackRunnable completed");
+    }
+
+    private Message getTrackInfoHandlerMessage(Track track) {
+        Bundle bundle = new Bundle();
+        bundle.putStringArray("trackInfo", new String[] {track.getName(), track.getArtistName(), track.getAlbumName(), track.getFilePath()});
+
+        Message message = new Message();
+        message.setData(bundle);
+
+        return message;
     }
 }

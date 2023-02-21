@@ -15,7 +15,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
     int albumId = 0;
 
     public static Handler inOutHandler;
-    public static Handler audioProgressHandler = new Handler();
+    public static Handler audioProgressHandler;
+    public static Handler trackInfoHandler;
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
@@ -89,48 +89,53 @@ public class MainActivity extends AppCompatActivity {
             startBaseService();
         }
 
-        // load and organize the artists then show them
-        inOutHandler = getInOutHandler();
-
-        // show updated playAudioProgress every 1 second
-        audioProgressHandler = getAudioProgressHandler();
+        inOutHandler = getInOutHandler(); // load and organize the artists then show them
+        audioProgressHandler = getAudioProgressHandler(); // show updated playAudioProgress every 1 second
+        trackInfoHandler = getTrackInfoHandler();
 
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
 
     // handlers
     private Handler getInOutHandler() {
-        return new Handler(new Handler.Callback() {
-            public boolean handleMessage(Message message) {
-                baseService.clearTracks();
-                for (Track track : allTracks) {
-                    baseService.insertTrack(track.getName(), track.getArtistName(), track.getAlbumName(), track.getFile().getAbsolutePath());
-                }
-
-                Collections.sort(artists);
-                Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
-                showArtists();
-
-                return true;
+        return new Handler(message -> {
+            baseService.clearTracks();
+            for (Track track : allTracks) {
+                baseService.insertTrack(track.getName(), track.getArtistName(), track.getAlbumName(), track.getFile().getAbsolutePath());
             }
+
+            Collections.sort(artists);
+            Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
+            showArtists();
+
+            return true;
         });
     }
 
     private Handler getAudioProgressHandler() {
-        return new Handler(new Handler.Callback() {
-            public boolean handleMessage(Message message) {
-                if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
-                    if (mediaPlayer != null) {
-                        if(isPlaying) {
-                            int currentProgress = mediaPlayer.getCurrentPosition() / 1000;
-                            playAudioProgress.setProgress(currentProgress);
-                            trackAndListInfo.setText((trackNumber + 1) + " из " + playList.size());
-                        }
+        return new Handler(message -> {
+            if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
+                if (mediaPlayer != null) {
+                    if(isPlaying) {
+                        int currentProgress = mediaPlayer.getCurrentPosition() / 1000;
+                        playAudioProgress.setProgress(currentProgress);
+                        trackAndListInfo.setText((trackNumber + 1) + " из " + playList.size());
                     }
                 }
-
-                return true;
             }
+
+            return true;
+        });
+    }
+
+    private Handler getTrackInfoHandler() {
+        return new Handler(message -> {
+            Bundle bundle = message.getData();
+            String[] trackInfo = bundle.getStringArray("trackInfo");
+
+            Log.d(TAG, "trackInfo: " + trackInfo[0] + " - " + trackInfo[1] + " - " + trackInfo[2] + " - " + trackInfo[3]);
+
+            return true;
         });
     }
 

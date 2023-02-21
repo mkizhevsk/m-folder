@@ -61,6 +61,8 @@ public class InOut {
         }
         track.setNumber(number);
 
+        track.setFilePath(file.getAbsolutePath());
+
         return track;
     }
 
