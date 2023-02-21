@@ -38,12 +38,12 @@ import java.util.List;
 
 public class Player {
 
+    public static List<File> properFiles;
+
     public static List<Track> allTracks;
     public static List<Integer> playList;
     public static List<Artist> artists;
     public static int trackNumber = 0;
-
-    private static final String TAG = "MainActivity";
 
     public static MediaPlayer mediaPlayer;
 
@@ -55,10 +55,10 @@ public class Player {
 
     private final Context context;
 
-    public static String tempPath = "/storage/5E08-92B8/Music2";
+    private String tempPath = "/storage/5E08-92B8/Music2";
 
     public static boolean isPlaying;
-    private static boolean pause = false;
+    private boolean pause = false;
 
     private Thread tracksThread;
 
@@ -75,7 +75,7 @@ public class Player {
         this.context = context;
     }
 
-    public static List<File> properFiles;
+    private static final String TAG = "MainActivity";
 
     public void getMediaFiles(String path) {
         Log.d(TAG, "start Player getMediaFiles()");
@@ -97,6 +97,11 @@ public class Player {
                 allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
 
                 playList.add(0);
+
+                // удаляем первый трек из оставшихся для обработки остальных файлов
+                properFiles.remove(0);
+                tracksThread = new Thread(new TracksRunnable());
+                tracksThread.start();
 
                 startPlayer();
             } else {
@@ -128,8 +133,7 @@ public class Player {
         // начинаем играть первый трек
         playSong(0);
 
-        // удаляем первый трек из оставшихся для обработки остальных файлов
-        properFiles.remove(0);
+
 
         // audioFocus
         afChangeListener =
@@ -165,13 +169,10 @@ public class Player {
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             Log.d(TAG, "AUDIOFOCUS_REQUEST_GRANTED");
         }
-
-        tracksThread = new Thread(new TracksRunnable());
-        tracksThread.start();
     }
 
     // play song by track index
-    public void playSong(int trackIndex) {
+    public void playSong(int playListIndex) {
         if(mediaPlayer == null){
             mediaPlayer = new MediaPlayer();
         }else{
@@ -181,7 +182,7 @@ public class Player {
         isPlaying = true;
 
         try {
-            currentTrack = allTracks.get(trackIndex);
+            currentTrack = allTracks.get(playListIndex);
 
             mediaPlayer.setDataSource(currentTrack.getFile().getAbsolutePath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -247,16 +248,19 @@ public class Player {
         if(!pause) {
             trackNumber++;
 
-            if(trackNumber > (playList.size() - 1)) {
-                playList.clear();
-                for(Track track : allTracks) {
-                    playList.add(allTracks.indexOf(track));
-                }
-                trackNumber = allTracks.size()/3;
-            }
+            if(trackNumber > (playList.size() - 1))
+                resetPlayList();
 
             playSong(playList.get(trackNumber));
         }
+    }
+
+    private void resetPlayList() {
+        playList.clear();
+        for(Track track : allTracks) {
+            playList.add(allTracks.indexOf(track));
+        }
+        trackNumber = allTracks.size()/3;
     }
 
     public void fastForward() {
@@ -381,5 +385,13 @@ public class Player {
         } else {
             Log.d(TAG, "null");
         }
+    }
+
+    public String getTempPath() {
+        return tempPath;
+    }
+
+    public void setTempPath(String tempPath) {
+        this.tempPath = tempPath;
     }
 }

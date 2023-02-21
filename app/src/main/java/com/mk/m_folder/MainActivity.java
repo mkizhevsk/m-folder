@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy");
         isPlaying = false;
 
-        baseService.saveSettings(Player.tempPath);
+        baseService.saveSettings(player.getTempPath());
         baseService.exportDatabase();
 
         if(inputStream != null) {
