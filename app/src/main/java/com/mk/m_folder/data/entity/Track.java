@@ -3,6 +3,7 @@ package com.mk.m_folder.data.entity;
 import androidx.annotation.NonNull;
 
 import java.io.File;
+import java.util.Objects;
 
 public class Track implements Comparable<Track> {
 
@@ -87,19 +88,15 @@ public class Track implements Comparable<Track> {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Track)) {
-            return false;
-        }
-
-        Track that = (Track) other;
-
-        return this.name.equals(that.name)
-                && (this.artistName.equals(that.artistName))
-                && (this.albumName.equals(that.albumName));
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Track track = (Track) o;
+        return name.equals(track.name) && Objects.equals(artistName, track.artistName) && Objects.equals(filePath, track.filePath);
     }
 
-    public String print() {
-        return this.artistName + " - " + this.albumName + " - " + this.name + " - " + this.number;
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, artistName, filePath);
     }
 }

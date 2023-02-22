@@ -77,7 +77,7 @@ public class Player {
 
     private static final String TAG = "MainActivity";
 
-    public void getMediaFiles(String path) {
+    public void getMediaFiles(String path, List<Track> dbTracks) {
         Log.d(TAG, "start Player getMediaFiles()");
         try {
             tempPath = path;
@@ -100,6 +100,12 @@ public class Player {
 
                 // удаляем первый трек из оставшихся для обработки остальных файлов
                 properFiles.remove(0);
+
+                // удаляем треки имеющиеся в БД
+                List<Integer> existedTrackIndexes = properFiles.stream()
+                        .map(p)
+
+
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
 

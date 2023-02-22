@@ -99,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
     // handlers
     private Handler getInOutHandler() {
         return new Handler(message -> {
-            baseService.clearTracks();
-            for (Track track : allTracks) {
-                baseService.insertTrack(track.getName(), track.getArtistName(), track.getAlbumName(), track.getFile().getAbsolutePath());
-            }
+//            baseService.clearTracks();
+//            for (Track track : allTracks) {
+//                baseService.insertTrack(track.getName(), track.getArtistName(), track.getAlbumName(), track.getFile().getAbsolutePath());
+//            }
 
             Collections.sort(artists);
             Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
@@ -132,8 +132,12 @@ public class MainActivity extends AppCompatActivity {
         return new Handler(message -> {
             Bundle bundle = message.getData();
             String[] trackInfo = bundle.getStringArray("trackInfo");
-
             Log.d(TAG, "trackInfo: " + trackInfo[0] + " - " + trackInfo[1] + " - " + trackInfo[2] + " - " + trackInfo[3]);
+
+            Track track = baseService.getTrackByFilePath(trackInfo[3]);
+            if(track == null) {
+                baseService.insertTrack(trackInfo[0], trackInfo[1], trackInfo[2], trackInfo[3]);
+            }
 
             return true;
         });
@@ -155,7 +159,11 @@ public class MainActivity extends AppCompatActivity {
 
             String tempPath = baseService.getSettings().get(0);
             Log.d(TAG, "MainActivity baseService tempPath=" + tempPath);
-            player.getMediaFiles(tempPath);
+
+            List<Track> dbTracks = baseService.getTracks();
+            Log.d(TAG, "MainActivity dbTracks=" + dbTracks.size());
+
+            player.getMediaFiles(tempPath, dbTracks);
         }
 
         @Override
