@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     public static Handler inOutHandler;
     public static Handler audioProgressHandler;
     public static Handler trackInfoHandler;
+    public static Handler saveSettingsHandler;
 
     private static final int UPDATE_AUDIO_PROGRESS_BAR = 3;
 
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         inOutHandler = getInOutHandler(); // load and organize the artists then show them
         audioProgressHandler = getAudioProgressHandler(); // show updated playAudioProgress every 1 second
         trackInfoHandler = getTrackInfoHandler();
+        saveSettingsHandler = getSaveSettingsHandler();
 
         playAudioProgress.setOnSeekBarChangeListener(seekBarChangeListener);
     }
@@ -99,11 +101,6 @@ public class MainActivity extends AppCompatActivity {
     // handlers
     private Handler getInOutHandler() {
         return new Handler(message -> {
-//            baseService.clearTracks();
-//            for (Track track : allTracks) {
-//                baseService.insertTrack(track.getName(), track.getArtistName(), track.getAlbumName(), track.getFile().getAbsolutePath());
-//            }
-
             Collections.sort(artists);
             Log.d(TAG, "MainActivity inOutHandler artists: " + artists.size());
             showArtists();
@@ -114,16 +111,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Handler getAudioProgressHandler() {
         return new Handler(message -> {
-            if (message.what == UPDATE_AUDIO_PROGRESS_BAR) {
-                if (mediaPlayer != null) {
-                    if(isPlaying) {
-                        int currentProgress = mediaPlayer.getCurrentPosition() / 1000;
-                        playAudioProgress.setProgress(currentProgress);
-                        trackAndListInfo.setText((trackNumber + 1) + " из " + playList.size());
-                    }
-                }
+            if (message.what == UPDATE_AUDIO_PROGRESS_BAR && mediaPlayer != null && isPlaying) {
+                int currentProgress = mediaPlayer.getCurrentPosition() / 1000;
+                playAudioProgress.setProgress(currentProgress);
+                trackAndListInfo.setText((trackNumber + 1) + " из " + playList.size());
             }
-
             return true;
         });
     }
@@ -132,13 +124,20 @@ public class MainActivity extends AppCompatActivity {
         return new Handler(message -> {
             Bundle bundle = message.getData();
             String[] trackInfo = bundle.getStringArray("trackInfo");
-            Log.d(TAG, "trackInfo: " + trackInfo[0] + " - " + trackInfo[1] + " - " + trackInfo[2] + " - " + trackInfo[3]);
+            //Log.d(TAG, "trackInfo: " + trackInfo[0] + " - " + trackInfo[1] + " - " + trackInfo[2] + " - " + trackInfo[3]);
 
             Track track = baseService.getTrackByFilePath(trackInfo[3]);
             if(track == null) {
                 baseService.insertTrack(trackInfo[0], trackInfo[1], trackInfo[2], trackInfo[3]);
             }
 
+            return true;
+        });
+    }
+
+    private Handler getSaveSettingsHandler() {
+        return new Handler(message -> {
+            baseService.saveSettings(player.getTempPath());
             return true;
         });
     }
@@ -200,29 +199,27 @@ public class MainActivity extends AppCompatActivity {
         });
 
         lvMain.setLongClickable(true);
-        lvMain.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
-                //Log.d(TAG, String.valueOf(position));
-                Artist artist = artists.get(position);
-                Collections.sort(artist.getAlbums());
-                playList.clear();
+        lvMain.setOnItemLongClickListener((parent, v, position, id) -> {
+            //Log.d(TAG, String.valueOf(position));
+            Artist artist = artists.get(position);
+            Collections.sort(artist.getAlbums());
+            playList.clear();
 
-                for(Album album : artist.getAlbums()) {
-                    Collections.sort(album.getTracks());
-                    for(Track track : album.getTracks()) {
-                        for(Track thisTrack : allTracks) {
-                            if(track.equals(thisTrack)) {
-                                playList.add(allTracks.indexOf(thisTrack));
-                                break;
-                            }
+            for(Album album : artist.getAlbums()) {
+                Collections.sort(album.getTracks());
+                for(Track track : album.getTracks()) {
+                    for(Track thisTrack : allTracks) {
+                        if(track.equals(thisTrack)) {
+                            playList.add(allTracks.indexOf(thisTrack));
+                            break;
                         }
                     }
                 }
-
-                trackNumber = 0;
-                player.playSong(playList.get(trackNumber));
-                return true;
             }
+
+            trackNumber = 0;
+            player.playSong(playList.get(trackNumber));
+            return true;
         });
 
         listLevel++;
@@ -240,41 +237,35 @@ public class MainActivity extends AppCompatActivity {
         lvMain.setAdapter(albumsAdapter);
         MyArrayAdapter.selectedItemPosition = 100;
 
-        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
-                view.setSelected(true);
-                albumId = position;
+        lvMain.setOnItemClickListener((parent, view, position, id) -> {
+            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
+            view.setSelected(true);
+            albumId = position;
 
-                List<Track> albumTracks = albums.get(position).getTracks();
-                Collections.sort(albumTracks);
-                showSongs(albumTracks);
-            }
+            List<Track> albumTracks = albums.get(position).getTracks();
+            Collections.sort(albumTracks);
+            showSongs(albumTracks);
         });
 
         lvMain.setLongClickable(true);
-        lvMain.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+        lvMain.setOnItemLongClickListener((parent, v, position, id) -> {
+            playList.clear();
 
-                playList.clear();
-
-                List<Track> albumTracks = albums.get(position).getTracks();
-                Collections.sort(albumTracks);
-                for (Track track : albumTracks) {
-                    for (Track thisTrack : allTracks) {
-                        if (track.equals(thisTrack)) {
-                            playList.add(allTracks.indexOf(thisTrack));
-                            break;
-                        }
+            List<Track> albumTracks = albums.get(position).getTracks();
+            Collections.sort(albumTracks);
+            for (Track track : albumTracks) {
+                for (Track thisTrack : allTracks) {
+                    if (track.equals(thisTrack)) {
+                        playList.add(allTracks.indexOf(thisTrack));
+                        break;
                     }
                 }
-
-                trackNumber = 0;
-                player.playSong(playList.get(trackNumber));
-
-                return true;
             }
+
+            trackNumber = 0;
+            player.playSong(playList.get(trackNumber));
+
+            return true;
         });
 
         listLevel++;
@@ -293,25 +284,22 @@ public class MainActivity extends AppCompatActivity {
         final MyArrayAdapter albumsAdapter = new MyArrayAdapter(this, stringSongs);
         lvMain.setAdapter(albumsAdapter);
 
-        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
-                view.setSelected(true);
-                MyArrayAdapter.selectedItemPosition = position;
+        lvMain.setOnItemClickListener((parent, view, position, id) -> {
+            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
+            view.setSelected(true);
+            MyArrayAdapter.selectedItemPosition = position;
 
-                playList.clear();
-                for(Track track : albumTracks) {
-                    for(Track thisTrack : allTracks) {
-                        if(track.equals(thisTrack)) {
-                            playList.add(allTracks.indexOf(thisTrack));
-                            break;
-                        }
+            playList.clear();
+            for(Track track : albumTracks) {
+                for(Track thisTrack : allTracks) {
+                    if(track.equals(thisTrack)) {
+                        playList.add(allTracks.indexOf(thisTrack));
+                        break;
                     }
                 }
-                trackNumber = position;
-                player.playSong(playList.get(trackNumber));
             }
+            trackNumber = position;
+            player.playSong(playList.get(trackNumber));
         });
 
         if(listLevel < 3) {

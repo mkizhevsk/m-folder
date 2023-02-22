@@ -4,7 +4,6 @@ import static android.content.Context.AUDIO_SERVICE;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +11,7 @@ import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Player {
 
@@ -94,17 +95,15 @@ public class Player {
                 Log.d(TAG, "Player getMediaFiles proper: " + properFiles.size() + ", other: " + otherFiles.size() + "; total: " + (properFiles.size() + otherFiles.size()) );
                 Collections.shuffle(properFiles);
 
-                allTracks.add(InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr));
-
+                Track firstTrack = InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr);
+                allTracks.add(firstTrack);
                 playList.add(0);
 
-                // удаляем первый трек из оставшихся для обработки остальных файлов
-                properFiles.remove(0);
+                properFiles.remove(0);  // удаляем первый трек из оставшихся для обработки остальных файлов
 
-                // удаляем треки имеющиеся в БД
-                List<Integer> existedTrackIndexes = properFiles.stream()
-                        .map(p)
+                List<File> existedFiles = clearProperFilesAndGetExistedFiles(dbTracks);
 
+                addExistedTracksToAllTracks(dbTracks, existedFiles, firstTrack);
 
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
@@ -117,6 +116,35 @@ public class Player {
             Log.d(TAG, "Player getMediaFiles media exception: " + e.toString());
             e.printStackTrace();
             editPath();
+        }
+    }
+
+    private List<File> clearProperFilesAndGetExistedFiles(List<Track> dbTracks) {
+        List<File> existedFiles = new ArrayList<>();
+        for(Track track : dbTracks) {
+            properFiles.stream()
+                    .filter(file -> track.getFilePath().equals(file.getAbsolutePath()))
+                    .forEach((file) -> existedFiles.add(file));
+        }
+        List<File> clearedFileList = properFiles.stream()
+                .filter(file -> !existedFiles.contains(file))
+                .collect(Collectors.toList());
+        properFiles = clearedFileList;
+        Log.d(TAG, "properFiles after dbTracks " + properFiles.size());
+
+        return existedFiles;
+    }
+
+    private void addExistedTracksToAllTracks(List<Track> dbTracks, List<File> existedFiles, Track firstTrack) {
+        Collections.shuffle(existedFiles);
+        for(File file : existedFiles) {
+            dbTracks.stream()
+                    .filter(track -> !firstTrack.getFilePath().equals(track.getFilePath()))
+                    .filter(track -> file.getAbsolutePath().equals(track.getFilePath()))
+                    .forEach((track) -> {
+                        allTracks.add(track);
+                        playList.add(allTracks.indexOf(track));
+                    });
         }
     }
 
@@ -139,29 +167,25 @@ public class Player {
         // начинаем играть первый трек
         playSong(0);
 
-
-
         // audioFocus
         afChangeListener =
-                new AudioManager.OnAudioFocusChangeListener() {
-                    public void onAudioFocusChange(int focusChange) {
-                        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                            // Permanent loss of audio focus
-                            Log.d(TAG,"AUDIOFOCUS_LOSS");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                            Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT");
-                            // Pause playback
-                            mediaPlayer.pause();
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                            // Lower the volume, keep playing
-                            Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                            // Your app has been granted audio focus again
-                            // Raise volume to normal, restart playback if necessary
-                            Log.d(TAG,"AUDIOFOCUS_GAIN");
-                            if(!pause) {
-                                mediaPlayer.start();
-                            }
+                focusChange -> {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        // Permanent loss of audio focus
+                        Log.d(TAG,"AUDIOFOCUS_LOSS");
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                        Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT");
+                        // Pause playback
+                        mediaPlayer.pause();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                        // Lower the volume, keep playing
+                        Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        // Your app has been granted audio focus again
+                        // Raise volume to normal, restart playback if necessary
+                        Log.d(TAG,"AUDIOFOCUS_GAIN");
+                        if(!pause) {
+                            mediaPlayer.start();
                         }
                     }
                 };
@@ -179,6 +203,7 @@ public class Player {
 
     // play song by track index
     public void playSong(int playListIndex) {
+        Log.d(TAG, "playSong " + playListIndex);
         if(mediaPlayer == null){
             mediaPlayer = new MediaPlayer();
         }else{
@@ -190,7 +215,7 @@ public class Player {
         try {
             currentTrack = allTracks.get(playListIndex);
 
-            mediaPlayer.setDataSource(currentTrack.getFile().getAbsolutePath());
+            mediaPlayer.setDataSource(currentTrack.getFilePath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare();
             mediaPlayer.start();
@@ -199,7 +224,7 @@ public class Player {
             artistTextView.setText(currentTrack.getArtistName());
             albumTextView.setText(currentTrack.getAlbumName());
 
-            mmr.setDataSource(currentTrack.getFile().getAbsolutePath());
+            mmr.setDataSource(currentTrack.getFilePath());
             byte [] data = mmr.getEmbeddedPicture();
             if(data != null) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -212,12 +237,7 @@ public class Player {
 
             pause = false;
 
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    nextTrack();
-                }
-            });
+            mediaPlayer.setOnCompletionListener(mp -> nextTrack());
 
             Thread playProgressThread = new Thread(new PlayProgressRunnable());
             playProgressThread.start();
@@ -339,29 +359,25 @@ public class Player {
         newPathDialogBuilder
                 .setCancelable(false)
                 .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                tempPath = pathInput.getText().toString();
-                                Log.d(TAG, "from input: " + tempPath);
-                                if(properFiles == null || properFiles.isEmpty()) getMediaFiles(tempPath);
-                            }
+                        (dialog, id) -> {
+                            tempPath = pathInput.getText().toString();
+                            Log.d(TAG, "from input: " + tempPath);
+                            MainActivity.saveSettingsHandler.sendMessage(new Message());
+                            if(properFiles == null || properFiles.isEmpty()) getMediaFiles(tempPath, new ArrayList<>());
                         })
                 .setNegativeButton("Отмена",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
         AlertDialog createDialog = newPathDialogBuilder.create();
         createDialog.show();
     }
 
     // reset
     public void reset() {
+        isPlaying = false;
+        trackNumber = 0;
+
         if(mediaPlayer != null) {
             try {
-                isPlaying = false;
-
                 mediaPlayer.stop();
                 mediaPlayer.release();
                 mediaPlayer = null;

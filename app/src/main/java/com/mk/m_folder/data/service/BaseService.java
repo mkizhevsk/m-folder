@@ -85,7 +85,7 @@ public class BaseService extends Service {
         Log.d(TAG, "start getTrackByFilePath " + filePath);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor trackCursor = db.rawQuery("SELECT * FROM " + TRACK_TABLE + " WHERE file_path = " + filePath, null);
+        Cursor trackCursor = db.rawQuery("SELECT * FROM " + TRACK_TABLE + " WHERE file_path = \"" + filePath + "\"", null);
 
         List<Track> tracks = getTracksByCursor(trackCursor);
         if(tracks.size() > 0) return tracks.get(0);
@@ -138,7 +138,7 @@ public class BaseService extends Service {
                 tracks.add(getTrackFromCursor(trackCursor));
             } while (trackCursor.moveToNext());
 
-        } else Log.d(TAG, "0 track rows");
+        } //else Log.d(TAG, "0 track rows");
 
         return tracks;
     }
