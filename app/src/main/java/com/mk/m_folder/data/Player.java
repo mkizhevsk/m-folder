@@ -98,17 +98,15 @@ public class Player {
                 Track firstTrack = InOut.getInstance().getTrackFromFile(properFiles.get(0), mmr);
                 allTracks.add(firstTrack);
                 playList.add(0);
+                startPlayer();
 
                 properFiles.remove(0);  // удаляем первый трек из оставшихся для обработки остальных файлов
-
                 List<File> existedFiles = clearProperFilesAndGetExistedFiles(dbTracks);
-
                 addExistedTracksToAllTracks(dbTracks, existedFiles, firstTrack);
 
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
 
-                startPlayer();
             } else {
                 editPath();
             }
