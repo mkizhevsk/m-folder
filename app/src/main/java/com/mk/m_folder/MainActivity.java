@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = false;
 
         baseService.saveSettings(player.getTempPath());
-        baseService.exportDatabase();
+        //baseService.exportDatabase();
 
         if(inputStream != null) {
             try {
