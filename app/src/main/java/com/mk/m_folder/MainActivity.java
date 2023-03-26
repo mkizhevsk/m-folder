@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void deleteTrack() {
         Log.d(TAG, "delete");
-        baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFile().getName());
+        baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFilePath());
         player.nextTrack();
         //File deletedFile = currentTrack.getFile();
 

@@ -11,7 +11,7 @@ public class Deletion {
     }
 
     public String getFullInfo() {
-        return trackName + " - " + artistName + " - " + fileName + " : " + fileName;
+        return trackName + " - " + artistName + " - " + fileName;
     }
 
     public String getTrackName() {

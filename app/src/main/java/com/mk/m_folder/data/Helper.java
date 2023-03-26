@@ -19,7 +19,11 @@ public class Helper {
         String deletedTracksInfo = "";
         for(Deletion deletion : deletions) {
             StringBuilder sb = new StringBuilder();
-            deletedTracksInfo = sb.append(deletedTracksInfo).append(getNewLine()).append(deletion.getFullInfo()).toString();
+            if(deletedTracksInfo.isEmpty()) {
+                deletedTracksInfo = deletion.getFullInfo();
+            } else {
+                deletedTracksInfo = sb.append(deletedTracksInfo).append(getNewLine()).append(getNewLine()).append(deletion.getFullInfo()).toString();
+            }
         }
         return deletedTracksInfo;
     }
