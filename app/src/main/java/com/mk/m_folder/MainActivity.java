@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
                 player.editPath();
                 break;
             case 2: // track info
-                String trackInfo = currentTrack.getFile().getAbsolutePath();
+                String trackInfo = currentTrack.getFilePath();
 //                Toast.makeText(this, trackInfo, Toast.LENGTH_LONG).show();
                 Log.d(TAG, trackInfo);
                 Intent intent = new Intent(this, ListActivity.class);
