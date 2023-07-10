@@ -238,8 +238,8 @@ public class MainActivity extends AppCompatActivity {
         MyArrayAdapter.selectedItemPosition = 100;
 
         lvMain.setOnItemClickListener((parent, view, position, id) -> {
-            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
-            view.setSelected(true);
+            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id + " " + view.getId());
+            //view.setSelected(true);
             albumId = position;
 
             List<Track> albumTracks = albums.get(position).getTracks();
@@ -248,8 +248,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         lvMain.setLongClickable(true);
-        lvMain.setOnItemLongClickListener((parent, v, position, id) -> {
+        lvMain.setOnItemLongClickListener((parent, view, position, id) -> {
+            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
             playList.clear();
+            view.setSelected(true);
 
             List<Track> albumTracks = albums.get(position).getTracks();
             Collections.sort(albumTracks);

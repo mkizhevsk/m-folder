@@ -76,6 +76,9 @@ public class Player {
         this.context = context;
     }
 
+    private static String PAUSE_TEXT = "pause";
+    private static String PLAY_TEXT = "play";
+
     private static final String TAG = "MainActivity";
 
     public void getMediaFiles(String path, List<Track> dbTracks) {
@@ -234,6 +237,7 @@ public class Player {
             playAudioProgress.setMax(mediaPlayer.getDuration()/1000);
 
             pause = false;
+            playPause.setText(PAUSE_TEXT);
 
             mediaPlayer.setOnCompletionListener(mp -> nextTrack());
 
@@ -249,11 +253,11 @@ public class Player {
     public void playPause() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-            playPause.setText("play");
+            playPause.setText(PLAY_TEXT);
             pause = true;
         } else {
             mediaPlayer.start();
-            playPause.setText("pause");
+            playPause.setText(PAUSE_TEXT);
             pause = false;
         }
     }
