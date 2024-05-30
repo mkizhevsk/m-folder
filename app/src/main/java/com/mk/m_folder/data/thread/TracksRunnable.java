@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 
-import com.mk.m_folder.MainActivity;
+import com.mk.m_folder.ui.MainActivity;
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.entity.Track;
 

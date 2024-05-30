@@ -1,10 +1,12 @@
-package com.mk.m_folder;
+package com.mk.m_folder.ui;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
+
+import com.mk.m_folder.R;
 
 public class ListActivity extends Activity {
 

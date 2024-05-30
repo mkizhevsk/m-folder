@@ -3,7 +3,7 @@ package com.mk.m_folder.data.thread;
 import android.os.Message;
 import android.util.Log;
 
-import static com.mk.m_folder.MainActivity.audioProgressHandler;
+import static com.mk.m_folder.ui.MainActivity.audioProgressHandler;
 import static com.mk.m_folder.data.Player.isPlaying;
 
 public class PlayProgressRunnable implements Runnable {

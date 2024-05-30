@@ -1,4 +1,4 @@
-package com.mk.m_folder;
+package com.mk.m_folder.ui;
 
 import static com.mk.m_folder.data.Player.allTracks;
 import static com.mk.m_folder.data.Player.artists;
@@ -23,17 +23,18 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.mk.m_folder.MyArrayAdapter;
+import com.mk.m_folder.R;
 import com.mk.m_folder.data.Helper;
 import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
-import com.mk.m_folder.data.service.BaseService;
+import com.mk.m_folder.service.BaseService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,13 +42,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    Player player;
+    public Player player;
 
     public static int listLevel = 0;
     public static boolean readyToEnd = true;
@@ -69,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
     public static InputStream inputStream;
     public static OutputStream outputStream;
 
-    BaseService baseService;
+    public BaseService baseService;
+
+    OptionsMenuHandler optionsMenuHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         lvMain.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         player = new Player(this);
+        optionsMenuHandler = new OptionsMenuHandler(this, player);
 
         if(Helper.checkPermissions(this, this)) {
             Log.d(TAG, "permission granted by default");
@@ -368,45 +371,10 @@ public class MainActivity extends AppCompatActivity {
 
     // top right menu
     public  boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 1, 0, "path to music");
-        menu.add(0, 2, 0, "track info");
-        menu.add(0, 3, 0, "delete track");
-        menu.add(0, 4, 0, "show deleted tracks");
-        menu.add(0, 5, 0, "clear deleted tracks");
-        return super.onCreateOptionsMenu(menu);
+        return optionsMenuHandler.onCreateOptionsMenu(menu);
     }
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case 1: // path to music
-                player.editPath();
-                break;
-            case 2: // track info
-                String trackInfo = currentTrack.getFilePath();
-//                Toast.makeText(this, trackInfo, Toast.LENGTH_LONG).show();
-                Log.d(TAG, trackInfo);
-                Intent intent = new Intent(this, ListActivity.class);
-                intent.putExtra("content", trackInfo);
-                startActivity(intent);
-                break;
-            case 3:
-                deleteTrack();
-                break;
-            case 4:
-                String deletedTracksInfo = Helper.getDeletedTracksInfo(baseService.getDeletions());
-                Log.d(TAG, deletedTracksInfo);
-                Intent deletedIntent = new Intent(this, ListActivity.class);
-                deletedIntent.putExtra("content", deletedTracksInfo);
-                startActivity(deletedIntent);
-                break;
-            case 5:
-                int clearedDeletions = baseService.clearDeletions();
-                Toast.makeText(this, String.format(Locale.ENGLISH,
-                        "%d deleted tracks was cleared",
-                        clearedDeletions),
-                        Toast.LENGTH_LONG).show();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+        return optionsMenuHandler.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     public void deleteTrack() {

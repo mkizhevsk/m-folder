@@ -1,4 +1,4 @@
-package com.mk.m_folder.data.service;
+package com.mk.m_folder.service;
 
 import android.app.Service;
 import android.content.ContentValues;

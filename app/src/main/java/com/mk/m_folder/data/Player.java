@@ -23,7 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.mk.m_folder.MainActivity;
+import com.mk.m_folder.ui.MainActivity;
 import com.mk.m_folder.R;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
