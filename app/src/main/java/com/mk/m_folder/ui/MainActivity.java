@@ -25,6 +25,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.mk.m_folder.MyArrayAdapter;
@@ -369,6 +370,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        player.handleActivityResult(requestCode, resultCode, data);
+    }
+
     // top right menu
     public  boolean onCreateOptionsMenu(Menu menu) {
         return optionsMenuHandler.onCreateOptionsMenu(menu);
@@ -381,10 +388,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "delete");
         baseService.insertDeletion(currentTrack.getName(), currentTrack.getArtistName(), currentTrack.getAlbumName(), currentTrack.getFilePath());
         player.nextTrack();
-        //File deletedFile = currentTrack.getFile();
-
-        //boolean deleted = deletedFile.delete();
-        //if (deleted) Log.d(TAG, "file was deleted");
     }
 
     @Override

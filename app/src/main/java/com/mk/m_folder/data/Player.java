@@ -2,7 +2,6 @@ package com.mk.m_folder.data;
 
 import static android.content.Context.AUDIO_SERVICE;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,24 +10,26 @@ import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
+import android.net.Uri;
 import android.os.Message;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.mk.m_folder.ui.MainActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.mk.m_folder.R;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
 import com.mk.m_folder.data.thread.PlayProgressRunnable;
 import com.mk.m_folder.data.thread.TracksRunnable;
+import com.mk.m_folder.ui.MainActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,29 +40,26 @@ import java.util.stream.Collectors;
 
 public class Player {
 
-    public static List<File> properFiles;
+    private static final String TAG = "Player";
+    private static final String PAUSE_TEXT = "pause";
+    private static final String PLAY_TEXT = "play";
 
+    public static List<File> properFiles;
     public static List<Track> allTracks;
     public static List<Integer> playList;
     public static List<Artist> artists;
     public static int trackNumber = 0;
-
     public static MediaPlayer mediaPlayer;
-
-    private AudioManager audioManager;
-    private MediaSession mediaSession;
-    private AudioManager.OnAudioFocusChangeListener afChangeListener;
-
-    private MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+    public static Track currentTrack;
 
     private final Context context;
-
-    private String tempPath = "/storage/5E08-92B8/Music2";
-
-    public static boolean isPlaying;
-    private boolean pause = false;
-
+    private AudioManager audioManager;
+    private MediaSession mediaSession;
+    private MediaMetadataRetriever mmr;
     private Thread tracksThread;
+    public static boolean isPlaying;
+    private boolean pause;
+    private String tempPath;
 
     private ImageView coverImageView;
     private TextView songTextView;
@@ -70,25 +68,23 @@ public class Player {
     private SeekBar playAudioProgress;
     private Button playPause;
 
-    public static Track currentTrack;
+    private AudioManager.OnAudioFocusChangeListener afChangeListener;
+
+    private static final int REQUEST_CODE_OPEN_DIRECTORY = 1;
 
     public Player(Context context) {
         this.context = context;
+        this.mmr = new MediaMetadataRetriever();
+        this.tempPath = "/storage/5E08-92B8/Music2";
+        this.isPlaying = false;
+        this.pause = false;
     }
-
-    private static String PAUSE_TEXT = "pause";
-    private static String PLAY_TEXT = "play";
-
-    private static final String TAG = "MainActivity";
 
     public void getMediaFiles(String path, List<Track> dbTracks) {
         Log.d(TAG, "start Player getMediaFiles()");
         try {
             tempPath = path;
-
-            allTracks = new ArrayList<>();
-            playList = new ArrayList<>();
-            mmr = new MediaMetadataRetriever();
+            initializeMediaLists();
 
             StorageFiles storageFiles = InOut.getInstance().getStorageFiles(tempPath);
             if(storageFiles != null && !storageFiles.getProperFiles().isEmpty()) {
@@ -109,7 +105,6 @@ public class Player {
 
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
-
             } else {
                 editPath();
             }
@@ -120,6 +115,11 @@ public class Player {
         }
     }
 
+    private void initializeMediaLists() {
+        allTracks = new ArrayList<>();
+        playList = new ArrayList<>();
+    }
+
     private List<File> clearProperFilesAndGetExistedFiles(List<Track> dbTracks) {
         List<File> existedFiles = new ArrayList<>();
         for(Track track : dbTracks) {
@@ -127,10 +127,9 @@ public class Player {
                     .filter(file -> track.getFilePath().equals(file.getAbsolutePath()))
                     .forEach((file) -> existedFiles.add(file));
         }
-        List<File> clearedFileList = properFiles.stream()
+        properFiles = properFiles.stream()
                 .filter(file -> !existedFiles.contains(file))
                 .collect(Collectors.toList());
-        properFiles = clearedFileList;
         Log.d(TAG, "properFiles after dbTracks " + properFiles.size());
 
         return existedFiles;
@@ -152,49 +151,52 @@ public class Player {
     // start player
     public void startPlayer() {
         Log.d(TAG, "start Player startPlayer()");
-
-        coverImageView = ((MainActivity)context).findViewById(R.id.coverImage);
-        songTextView = ((MainActivity)context).findViewById(R.id.textSong);
-        artistTextView = ((MainActivity)context).findViewById(R.id.textArtist);
-        albumTextView = ((MainActivity)context).findViewById(R.id.textAlbum);
-        playAudioProgress = ((MainActivity)context).findViewById(R.id.play_audio_seek_bar);
-        playPause = ((MainActivity)context).findViewById(R.id.btnPlayPause);
+        initializeUIComponents();
 
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         initMediaSession();
 
         playAudioProgress.setVisibility(ProgressBar.VISIBLE);
+        playSong(0); // начинаем играть первый трек
+        setupAudioFocus();
+    }
 
-        // начинаем играть первый трек
-        playSong(0);
+    private void initializeUIComponents() {
+        MainActivity activity = (MainActivity) context;
+        coverImageView = activity.findViewById(R.id.coverImage);
+        songTextView = activity.findViewById(R.id.textSong);
+        artistTextView = activity.findViewById(R.id.textArtist);
+        albumTextView = activity.findViewById(R.id.textAlbum);
+        playAudioProgress = activity.findViewById(R.id.play_audio_seek_bar);
+        playPause = activity.findViewById(R.id.btnPlayPause);
+    }
 
-        // audioFocus
-        afChangeListener =
-                focusChange -> {
-                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                        // Permanent loss of audio focus
-                        Log.d(TAG,"AUDIOFOCUS_LOSS");
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                        Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT");
-                        // Pause playback
-                        mediaPlayer.pause();
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                        // Lower the volume, keep playing
-                        Log.d(TAG,"AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                        // Your app has been granted audio focus again
-                        // Raise volume to normal, restart playback if necessary
-                        Log.d(TAG,"AUDIOFOCUS_GAIN");
-                        if(!pause) {
-                            mediaPlayer.start();
-                        }
+    private void setupAudioFocus() {
+        afChangeListener = focusChange -> {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    Log.d(TAG, "AUDIOFOCUS_LOSS");
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    Log.d(TAG, "AUDIOFOCUS_LOSS_TRANSIENT");
+                    mediaPlayer.pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    Log.d(TAG, "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK");
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    Log.d(TAG, "AUDIOFOCUS_GAIN");
+                    if (!pause) {
+                        mediaPlayer.start();
                     }
-                };
+                    break;
+                default:
+                    break;
+            }
+        };
 
         int result = audioManager.requestAudioFocus(afChangeListener,
-                // Use the music stream.
                 AudioManager.STREAM_MUSIC,
-                // Request permanent focus.
                 AudioManager.AUDIOFOCUS_GAIN);
 
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -205,6 +207,7 @@ public class Player {
     // play song by track index
     public void playSong(int playListIndex) {
         Log.d(TAG, "playSong " + playListIndex);
+
         if(mediaPlayer == null){
             mediaPlayer = new MediaPlayer();
         }else{
@@ -214,6 +217,7 @@ public class Player {
         isPlaying = true;
 
         try {
+            initializeMediaPlayer();
             currentTrack = allTracks.get(playListIndex);
 
             mediaPlayer.setDataSource(currentTrack.getFilePath());
@@ -221,32 +225,45 @@ public class Player {
             mediaPlayer.prepare();
             mediaPlayer.start();
 
-            songTextView.setText(currentTrack.getName());
-            artistTextView.setText(currentTrack.getArtistName());
-            albumTextView.setText(currentTrack.getAlbumName());
-
-            mmr.setDataSource(currentTrack.getFilePath());
-            byte [] data = mmr.getEmbeddedPicture();
-            if(data != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                coverImageView.setImageBitmap(bitmap); //associated cover art in bitmap
-            } else {
-                coverImageView.setImageResource(R.drawable.default_cover);
-            }
-
-            playAudioProgress.setMax(mediaPlayer.getDuration()/1000);
+            updateUIWithTrackDetails();
+            setupMediaPlayerListeners();
 
             pause = false;
             playPause.setText(PAUSE_TEXT);
 
-            mediaPlayer.setOnCompletionListener(mp -> nextTrack());
-
-            Thread playProgressThread = new Thread(new PlayProgressRunnable());
-            playProgressThread.start();
-
+            new Thread(new PlayProgressRunnable()).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void initializeMediaPlayer() {
+        if (mediaPlayer == null) {
+            mediaPlayer = new MediaPlayer();
+        } else {
+            mediaPlayer.reset();
+        }
+    }
+
+    private void updateUIWithTrackDetails() {
+        songTextView.setText(currentTrack.getName());
+        artistTextView.setText(currentTrack.getArtistName());
+        albumTextView.setText(currentTrack.getAlbumName());
+
+        mmr.setDataSource(currentTrack.getFilePath());
+        byte[] data = mmr.getEmbeddedPicture();
+        if (data != null) {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            coverImageView.setImageBitmap(bitmap);
+        } else {
+            coverImageView.setImageResource(R.drawable.default_cover);
+        }
+
+        playAudioProgress.setMax(mediaPlayer.getDuration() / 1000);
+    }
+
+    private void setupMediaPlayerListeners() {
+        mediaPlayer.setOnCompletionListener(mp -> nextTrack());
     }
 
     // playPause
@@ -297,9 +314,6 @@ public class Player {
 
     public void volumeUp() {
         audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
-//        int musicVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-//        Log.d(TAG, "volume: " + musicVolume);
-//        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 2,);
     }
 
     public void volumeDown() {
@@ -320,16 +334,7 @@ public class Player {
                 Log.d(TAG, "onMediaButtonEvent called: " + mediaButtonIntent);
                 KeyEvent keyEvent = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
                 if (keyEvent != null && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                    int keyCode = keyEvent.getKeyCode();
-                    Log.d(TAG, "onMediaButtonEvent Received command: " + keyCode);
-
-                    if(keyCode == 87) {
-                        nextTrack();
-                    } else if(keyCode == 127 || keyCode == 126) {
-                        playPause();
-                    } else if(keyCode == 88) {
-                        previousTrack();
-                    }
+                    handleMediaButtonEvent(keyEvent);
                 }
                 return super.onMediaButtonEvent(mediaButtonIntent);
             }
@@ -337,7 +342,6 @@ public class Player {
             @Override
             public void onSkipToNext() {
                 Log.d(TAG, "onSkipToNext called (media button pressed)");
-
                 super.onSkipToNext();
             }
         });
@@ -350,27 +354,64 @@ public class Player {
         }
     }
 
-    // edit path
+    private void handleMediaButtonEvent(KeyEvent keyEvent) {
+        int keyCode = keyEvent.getKeyCode();
+        Log.d(TAG, "onMediaButtonEvent Received command: " + keyCode);
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+                nextTrack();
+                break;
+            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+            case KeyEvent.KEYCODE_MEDIA_PAUSE:
+            case KeyEvent.KEYCODE_MEDIA_PLAY:
+                playPause();
+                break;
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                previousTrack();
+                break;
+            default:
+                break;
+        }
+    }
+
     public void editPath() {
-        LayoutInflater pi = LayoutInflater.from(context);
-        View pathView = pi.inflate(R.layout.path, null);
-        AlertDialog.Builder newPathDialogBuilder = new AlertDialog.Builder(context);
-        newPathDialogBuilder.setView(pathView);
-        final EditText pathInput = pathView.findViewById(R.id.input_path);
-        pathInput.setText(tempPath);
-        newPathDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",
-                        (dialog, id) -> {
-                            tempPath = pathInput.getText().toString();
-                            Log.d(TAG, "from input: " + tempPath);
-                            MainActivity.saveSettingsHandler.sendMessage(new Message());
-                            if(properFiles == null || properFiles.isEmpty()) getMediaFiles(tempPath, new ArrayList<>());
-                        })
-                .setNegativeButton("Отмена",
-                        (dialog, id) -> dialog.cancel());
-        AlertDialog createDialog = newPathDialogBuilder.create();
-        createDialog.show();
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_OPEN_DIRECTORY);
+    }
+
+    public void handleActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CODE_OPEN_DIRECTORY && resultCode == AppCompatActivity.RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    // Get the document ID from the URI
+                    String documentId = DocumentsContract.getTreeDocumentId(uri);
+
+                    // Log the document ID for debugging purposes
+                    Log.d(TAG, "Document ID: " + documentId);
+
+                    // Map the logical document ID to the physical path
+                    if (documentId.startsWith("primary:")) {
+                        tempPath = "/storage/emulated/0/" + documentId.substring(8);
+                    } else {
+                        // Handle other cases if necessary
+                        Log.e(TAG, "Unsupported storage type");
+                        return;
+                    }
+
+                    // Log the constructed path
+                    Log.d(TAG, "Constructed path: " + tempPath);
+
+                    MainActivity.saveSettingsHandler.sendMessage(new Message());
+
+                    // Load media files if there are no existing proper files
+                    if (properFiles == null || properFiles.isEmpty()) {
+                        getMediaFiles(tempPath, new ArrayList<>());
+                    }
+                }
+            }
+        }
     }
 
     // reset
