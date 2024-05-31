@@ -1,4 +1,4 @@
-package com.mk.m_folder.data;
+package com.mk.m_folder.util;
 
 import android.Manifest;
 import android.app.Activity;

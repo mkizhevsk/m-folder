@@ -1,4 +1,4 @@
-package com.mk.m_folder.data.thread;
+package com.mk.m_folder.thread;
 
 import static com.mk.m_folder.data.Player.allTracks;
 import static com.mk.m_folder.data.Player.artists;

@@ -27,8 +27,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.mk.m_folder.R;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
-import com.mk.m_folder.data.thread.PlayProgressRunnable;
-import com.mk.m_folder.data.thread.TracksRunnable;
+import com.mk.m_folder.thread.PlayProgressRunnable;
+import com.mk.m_folder.thread.TracksRunnable;
 import com.mk.m_folder.ui.MainActivity;
 
 import java.io.File;
