@@ -1,10 +1,10 @@
 package com.mk.m_folder.thread;
 
+import static com.mk.m_folder.media.Player.isPlaying;
+import static com.mk.m_folder.ui.MainActivity.audioProgressHandler;
+
 import android.os.Message;
 import android.util.Log;
-
-import static com.mk.m_folder.ui.MainActivity.audioProgressHandler;
-import static com.mk.m_folder.data.Player.isPlaying;
 
 public class PlayProgressRunnable implements Runnable {
 

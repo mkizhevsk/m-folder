@@ -1,18 +1,18 @@
 package com.mk.m_folder.thread;
 
-import static com.mk.m_folder.data.Player.allTracks;
-import static com.mk.m_folder.data.Player.artists;
-import static com.mk.m_folder.data.Player.playList;
-import static com.mk.m_folder.data.Player.properFiles;
+import static com.mk.m_folder.media.Player.allTracks;
+import static com.mk.m_folder.media.Player.artists;
+import static com.mk.m_folder.media.Player.playList;
+import static com.mk.m_folder.media.Player.properFiles;
 
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 
-import com.mk.m_folder.ui.MainActivity;
 import com.mk.m_folder.data.InOut;
 import com.mk.m_folder.data.entity.Track;
+import com.mk.m_folder.ui.MainActivity;
 
 import java.io.File;
 

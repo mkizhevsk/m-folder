@@ -1,6 +1,6 @@
 package com.mk.m_folder.ui;
 
-import static com.mk.m_folder.data.Player.currentTrack;
+import static com.mk.m_folder.media.Player.currentTrack;
 
 import android.content.Intent;
 import android.util.Log;
@@ -8,8 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mk.m_folder.media.Player;
 import com.mk.m_folder.util.Helper;
-import com.mk.m_folder.data.Player;
 
 import java.util.Locale;
 

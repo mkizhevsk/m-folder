@@ -1,12 +1,12 @@
 package com.mk.m_folder.ui;
 
-import static com.mk.m_folder.data.Player.allTracks;
-import static com.mk.m_folder.data.Player.artists;
-import static com.mk.m_folder.data.Player.currentTrack;
-import static com.mk.m_folder.data.Player.isPlaying;
-import static com.mk.m_folder.data.Player.mediaPlayer;
-import static com.mk.m_folder.data.Player.playList;
-import static com.mk.m_folder.data.Player.trackNumber;
+import static com.mk.m_folder.media.Player.allTracks;
+import static com.mk.m_folder.media.Player.artists;
+import static com.mk.m_folder.media.Player.currentTrack;
+import static com.mk.m_folder.media.Player.isPlaying;
+import static com.mk.m_folder.media.Player.mediaPlayer;
+import static com.mk.m_folder.media.Player.playList;
+import static com.mk.m_folder.media.Player.trackNumber;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -30,12 +30,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.mk.m_folder.MyArrayAdapter;
 import com.mk.m_folder.R;
-import com.mk.m_folder.util.Helper;
-import com.mk.m_folder.data.Player;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
 import com.mk.m_folder.data.entity.Track;
+import com.mk.m_folder.media.Player;
 import com.mk.m_folder.service.BaseService;
+import com.mk.m_folder.util.Helper;
 
 import java.io.IOException;
 import java.io.InputStream;
