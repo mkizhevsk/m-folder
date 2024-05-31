@@ -319,23 +319,15 @@ public class MainActivity extends AppCompatActivity {
             case TRACK_LEVEL:
                 showAlbums(artists.get(artistId).getAlbums());
                 listLevel = ALBUM_LEVEL;
-//                readyToEnd = false;
                 break;
             case ALBUM_LEVEL:
                 showArtists();
                 listLevel = ARTIST_LEVEL;
-//                readyToEnd = false;
                 break;
             case ARTIST_LEVEL:
-//                readyToEnd = true;
                 this.finishAffinity();
                 break;
         }
-
-//        if (readyToEnd) {
-//            Log.d(TAG, String.valueOf(listLevel));
-//            this.finishAffinity();
-//        }
     }
 
     public void playNextTrack(View view) {
