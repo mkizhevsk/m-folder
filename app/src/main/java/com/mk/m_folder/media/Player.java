@@ -71,7 +71,7 @@ public class Player {
         this.context = context;
         this.mmr = new MediaMetadataRetriever();
         this.tempPath = "/storage/5E08-92B8/Music2";
-        this.isPlaying = false;
+        Player.isPlaying = false;
         this.pause = false;
     }
 
@@ -100,8 +100,7 @@ public class Player {
                 editPath();
             }
         } catch (Exception e) {
-            Log.d(TAG, "Player getMediaFiles media exception: " + e.toString());
-            e.printStackTrace();
+            Log.e(TAG, "Player getMediaFiles media exception: " + e.getMessage(), e);
             editPath();
         }
     }

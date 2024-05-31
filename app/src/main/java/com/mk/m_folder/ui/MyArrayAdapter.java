@@ -1,4 +1,4 @@
-package com.mk.m_folder;
+package com.mk.m_folder.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,13 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.mk.m_folder.R;
+
 public class MyArrayAdapter extends ArrayAdapter<String> {
 
     private final Context context;
     private final String[] values;
 
     public static int selectedItemPosition = 100;
-    //boolean newAdapter;
 
     private static final String TAG = "MainActivity";
 
@@ -21,7 +22,6 @@ public class MyArrayAdapter extends ArrayAdapter<String> {
         super(context, -1, values);
         this.context = context;
         this.values = values;
-        //this.newAdapter = true;
     }
 
     @Override
@@ -30,12 +30,8 @@ public class MyArrayAdapter extends ArrayAdapter<String> {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list_item, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.textView);
+        TextView textView = rowView.findViewById(R.id.textView);
         textView.setText(values[position]);
-
-//        if(position == selectedItemPosition) {
-//            textView.setTextColor(Color.parseColor("#FFFFFF"));
-//        }
 
         return rowView;
     }

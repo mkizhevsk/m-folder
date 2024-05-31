@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -28,7 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mk.m_folder.MyArrayAdapter;
 import com.mk.m_folder.R;
 import com.mk.m_folder.data.entity.Album;
 import com.mk.m_folder.data.entity.Artist;
@@ -50,9 +48,12 @@ public class MainActivity extends AppCompatActivity {
 
     public Player player;
 
-    public static int listLevel = 0;
-    public static boolean readyToEnd = true;
     public static int artistId = 0;
+
+    private int listLevel = 0;
+    private static final int ARTIST_LEVEL = 1;
+    private static final int ALBUM_LEVEL = 2;
+    private static final int TRACK_LEVEL = 3;
 
     TextView trackAndListInfo;
     SeekBar playAudioProgress;
@@ -190,21 +191,18 @@ public class MainActivity extends AppCompatActivity {
         lvMain.setAdapter(artistsAdapter);
         MyArrayAdapter.selectedItemPosition = 100;
 
-        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
-                view.setSelected(true);
-                Collections.sort(artists.get(position).getAlbums());
+        lvMain.setOnItemClickListener((parent, view, position, id) -> {
+            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
+            view.setSelected(true);
+            Collections.sort(artists.get(position).getAlbums());
 
-                MainActivity.artistId = position;
-                showAlbums(artists.get(position).getAlbums());
-            }
+            MainActivity.artistId = position;
+            showAlbums(artists.get(position).getAlbums());
         });
 
         lvMain.setLongClickable(true);
         lvMain.setOnItemLongClickListener((parent, v, position, id) -> {
-            //Log.d(TAG, String.valueOf(position));
+            Log.d(TAG, String.valueOf(position));
             Artist artist = artists.get(position);
             Collections.sort(artist.getAlbums());
             playList.clear();
@@ -226,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        listLevel++;
+        listLevel = ALBUM_LEVEL;
     }
 
     public void showAlbums(final ArrayList<Album> albums) {
@@ -253,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
         lvMain.setLongClickable(true);
         lvMain.setOnItemLongClickListener((parent, view, position, id) -> {
-            //Log.d(TAG, "itemClick: position = " + position + ", id = " + id);
+            Log.d(TAG, "showAlbums setOnItemLongClickListener: position = " + position + ", id = " + id);
             playList.clear();
             view.setSelected(true);
 
@@ -274,9 +272,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        listLevel++;
-        readyToEnd = false;
-        //Log.d(TAG, "showAlbums: " + listLevel);
+        listLevel = ALBUM_LEVEL;
     }
 
     public void showSongs(final List<Track> albumTracks) {
@@ -307,29 +303,39 @@ public class MainActivity extends AppCompatActivity {
             trackNumber = position;
             player.playSong(playList.get(trackNumber));
         });
+        lvMain.setOnItemLongClickListener((parent, view, position, id) -> {
+            Log.d(TAG, "showSongs setOnItemLongClickListener");
+            return true;
+        });
 
-        if(listLevel < 3) {
-            listLevel++;
-        }
+        listLevel = TRACK_LEVEL;
     }
 
     // process back button
     @Override
     public void onBackPressed() {
-        //Log.d(TAG, String.valueOf(listLevel));
-        if(listLevel == 3) {
-            listLevel = listLevel - 2;
-            readyToEnd = false;
-            showAlbums(artists.get(artistId).getAlbums());
-        } else if(listLevel == 2) {
-            listLevel = listLevel - 2;
-            readyToEnd = false;
-            showArtists();
-        } else if(listLevel == 1) {
-            readyToEnd = true;
+        Log.d(TAG, String.valueOf(listLevel));
+        switch (listLevel) {
+            case TRACK_LEVEL:
+                showAlbums(artists.get(artistId).getAlbums());
+                listLevel = ALBUM_LEVEL;
+//                readyToEnd = false;
+                break;
+            case ALBUM_LEVEL:
+                showArtists();
+                listLevel = ARTIST_LEVEL;
+//                readyToEnd = false;
+                break;
+            case ARTIST_LEVEL:
+//                readyToEnd = true;
+                this.finishAffinity();
+                break;
         }
 
-        if(readyToEnd) this.finishAffinity();
+//        if (readyToEnd) {
+//            Log.d(TAG, String.valueOf(listLevel));
+//            this.finishAffinity();
+//        }
     }
 
     public void playNextTrack(View view) {
