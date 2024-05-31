@@ -162,7 +162,7 @@ public class Player {
 
             new Thread(new PlayProgressRunnable()).start();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error playing song", e);
         }
     }
 
