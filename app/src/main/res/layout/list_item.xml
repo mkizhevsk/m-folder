@@ -7,7 +7,5 @@
     android:gravity="center_vertical"
     android:padding="7dp"
     android:text="TextView"
-    android:background="@drawable/item_background_selector"
-    android:textColor="@drawable/item_text_selector"
     android:textSize="18sp">
 </TextView>

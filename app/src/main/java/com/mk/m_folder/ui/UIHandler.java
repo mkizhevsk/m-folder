@@ -50,9 +50,9 @@ public class UIHandler {
 
         lvMain.setOnItemClickListener((parent, view, position, id) -> {
             view.setSelected(true);
-            Collections.sort(artists.get(position).getAlbums());
-
             MainActivity.artistId = position;
+
+            Collections.sort(artists.get(position).getAlbums());
             showAlbums(artists.get(position).getAlbums());
         });
 
@@ -92,6 +92,7 @@ public class UIHandler {
         MyArrayAdapter.selectedItemPosition = 100;
 
         lvMain.setOnItemClickListener((parent, view, position, id) -> {
+            view.setSelected(true);
             MainActivity.albumId = position;
 
             List<Track> albumTracks = albums.get(position).getSortedTracks();
@@ -102,9 +103,6 @@ public class UIHandler {
         lvMain.setLongClickable(true);
         lvMain.setOnItemLongClickListener((parent, view, position, id) -> {
             Log.d(TAG, "showAlbums setOnItemLongClickListener: position = " + position + ", id = " + id);
-            playList.clear();
-            view.setSelected(true);
-
             List<Track> albumTracks = albums.get(position).getSortedTracks();
             Collections.sort(albumTracks);
 
@@ -112,6 +110,10 @@ public class UIHandler {
 
             trackNumber = 0;
             player.playSong(playList.get(trackNumber));
+
+            // Update the selected item position
+            MyArrayAdapter.selectedItemPosition = position;
+            albumsAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list
 
             return true;
         });
