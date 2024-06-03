@@ -3,6 +3,7 @@ package com.mk.m_folder.data.entity;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Album implements Comparable<Album> {
@@ -14,6 +15,11 @@ public class Album implements Comparable<Album> {
     public Album(String name, List<Track> tracks) {
         this.name = name;
         this.tracks = tracks;
+    }
+
+    public List<Track> getSortedTracks() {
+        Collections.sort(tracks);
+        return tracks;
     }
 
     public String getName() {

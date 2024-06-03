@@ -8,6 +8,11 @@
     <color name="black">#202124</color>
     <color name="item_text_color">#62666b</color>
 
+    <color name="selected_item_color">#008577</color>
+    <color name="selected_item_text_color">#FFFFFF</color>
+    <color name="default_item_color">#FFFFFF</color>
+    <color name="default_item_text_color">#62666b</color>
+
     <drawable name="item_background_color">#FAFAFA</drawable>
     <drawable name="item_pre_selected_background_color">#EDEDF0</drawable>
     <drawable name="item_selected_background_color">#008577</drawable>
