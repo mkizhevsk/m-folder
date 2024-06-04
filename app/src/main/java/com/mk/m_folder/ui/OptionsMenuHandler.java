@@ -88,7 +88,7 @@ public class OptionsMenuHandler {
                 .setMessage("Are you sure you want to exit?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        mainActivity.finishAffinity(); // or finish() if you just want to close the current activity
+                        mainActivity.finishAffinity();
                     }
                 })
                 .setNegativeButton(android.R.string.no, null)
