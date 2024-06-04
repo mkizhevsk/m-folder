@@ -2,13 +2,15 @@ package com.mk.m_folder.ui;
 
 import static com.mk.m_folder.media.Player.currentTrack;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.mk.m_folder.media.Player;
 import com.mk.m_folder.util.Helper;
 
 import java.util.Locale;
@@ -16,12 +18,13 @@ import java.util.Locale;
 public class OptionsMenuHandler {
 
     private static final String TAG = "OptionsMenuHandler";
-    private final MainActivity mainActivity;
-    private final Player player;
 
-    public OptionsMenuHandler(MainActivity mainActivity, Player player) {
+    private Context context;
+    private MainActivity mainActivity;
+
+    public OptionsMenuHandler(Context context, MainActivity mainActivity) {
+        this.context = context;
         this.mainActivity = mainActivity;
-        this.player = player;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -30,6 +33,7 @@ public class OptionsMenuHandler {
         menu.add(0, 3, 0, "delete track");
         menu.add(0, 4, 0, "show deleted tracks");
         menu.add(0, 5, 0, "clear deleted tracks");
+        menu.add(0, 6, 0, "exit");
         return true;
     }
 
@@ -62,6 +66,9 @@ public class OptionsMenuHandler {
                                 clearedDeletions),
                         Toast.LENGTH_LONG).show();
                 break;
+            case 6:
+                showExitConfirmationDialog();
+                break;
         }
         return true;
     }
@@ -73,6 +80,20 @@ public class OptionsMenuHandler {
                 currentTrack.getAlbumName(),
                 currentTrack.getFilePath());
         mainActivity.player.nextTrack();
+    }
+
+    public void showExitConfirmationDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Exit Confirmation")
+                .setMessage("Are you sure you want to exit?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        mainActivity.finishAffinity(); // or finish() if you just want to close the current activity
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }
 

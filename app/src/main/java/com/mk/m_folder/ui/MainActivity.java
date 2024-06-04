@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         lvMain.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         player = new Player(this);
-        optionsMenuHandler = new OptionsMenuHandler(this, player);
+        optionsMenuHandler = new OptionsMenuHandler(this, this);
         uiHandler = new UIHandler(this, player, lvMain);
 
         if(Helper.checkPermissions(this, this)) {
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 uiHandler.setListLevel(ARTIST_LEVEL);
                 break;
             case ARTIST_LEVEL:
-                this.finishAffinity();
+                optionsMenuHandler.showExitConfirmationDialog();
                 break;
         }
     }
