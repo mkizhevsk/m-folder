@@ -1,4 +1,14 @@
 <resources>
-    <string name="app_name">m-folder</string>
-    <string name="service_desc">SQLite service</string>
+    <string name="app_name" translatable="false">m-folder</string>
+    <string name="service_desc" translatable="false">SQLite service</string>
+
+    <string name="menu_path_to_music">Path to Music</string>
+    <string name="menu_track_info">Track Info</string>
+    <string name="menu_delete_track">Delete Track</string>
+    <string name="menu_deleted_tracks_info">Deleted Tracks Info</string>
+    <string name="menu_clear_deletions">Clear Deletions</string>
+    <string name="menu_exit">Exit</string>
+
+    <string name="exit_confirmation_title">Exit Confirmation</string>
+    <string name="exit_confirmation_message">Are you sure you want to exit?</string>
 </resources>

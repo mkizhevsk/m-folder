@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mk.m_folder.R;
 import com.mk.m_folder.util.Helper;
 
 import java.util.Locale;
@@ -28,12 +29,12 @@ public class OptionsMenuHandler {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 1, 0, "path to music");
-        menu.add(0, 2, 0, "track info");
-        menu.add(0, 3, 0, "delete track");
-        menu.add(0, 4, 0, "show deleted tracks");
-        menu.add(0, 5, 0, "clear deleted tracks");
-        menu.add(0, 6, 0, "exit");
+        menu.add(0, 1, 0, context.getString(R.string.menu_path_to_music));
+        menu.add(0, 2, 0, context.getString(R.string.menu_track_info));
+        menu.add(0, 3, 0, context.getString(R.string.menu_delete_track));
+        menu.add(0, 4, 0, context.getString(R.string.menu_deleted_tracks_info));
+        menu.add(0, 5, 0, context.getString(R.string.menu_clear_deletions));
+        menu.add(0, 6, 0, context.getString(R.string.menu_exit));
         return true;
     }
 
@@ -84,8 +85,8 @@ public class OptionsMenuHandler {
 
     public void showExitConfirmationDialog() {
         new AlertDialog.Builder(context)
-                .setTitle("Exit Confirmation")
-                .setMessage("Are you sure you want to exit?")
+                .setTitle(R.string.exit_confirmation_title)
+                .setMessage(R.string.exit_confirmation_message)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         mainActivity.finishAffinity();
