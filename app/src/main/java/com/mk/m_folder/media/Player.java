@@ -36,7 +36,7 @@ import java.util.List;
 
 public class Player {
 
-    private static final String TAG = "Player";
+    private static final String TAG = "MainActivity";
     private static final String PAUSE_TEXT = "pause";
     private static final String PLAY_TEXT = "play";
 
@@ -70,18 +70,19 @@ public class Player {
     public Player(Context context) {
         this.context = context;
         this.mmr = new MediaMetadataRetriever();
-        this.tempPath = "/storage/5E08-92B8/Music2";
+        this.tempPath = "/storage/7FEC-F5DD/Music";
         Player.isPlaying = false;
         this.pause = false;
     }
 
     public void getMediaFiles(String path, List<Track> dbTracks) {
-        Log.d(TAG, "start Player getMediaFiles()");
+        Log.d(TAG, "start Player getMediaFiles() " + tempPath);
         try {
             tempPath = path;
             initializeMediaLists();
 
             properFiles = FileUtils.initializeProperFiles(tempPath);
+            Log.d(TAG, "properFiles " + properFiles.size());
             if (!properFiles.isEmpty()) {
                 Collections.shuffle(properFiles);
 
@@ -91,9 +92,15 @@ public class Player {
                 startPlayer();
 
                 properFiles.remove(0);
-                List<File> existedFiles = FileUtils.clearProperFilesAndGetExistedFiles(dbTracks, properFiles);
-                FileUtils.addExistedTracksToAllTracks(dbTracks, existedFiles, firstTrack, allTracks, playList);
 
+                // находим existedFiles и чистим от них properFiles
+                List<File> existedFiles = FileUtils.getExistedFilesAndClearProperFiles(dbTracks, properFiles);
+                Log.d(TAG, "existedFiles " + existedFiles.size());
+
+                // добавляем existedFiles в allTracks и playList
+                FileUtils.addExistedTracksToAllTracksAndPlayList(dbTracks, existedFiles, firstTrack, allTracks, playList);
+
+                // оставшиеся (за вычетом existedFiles) properFiles обрабатываем в отдельном потоке
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
             } else {

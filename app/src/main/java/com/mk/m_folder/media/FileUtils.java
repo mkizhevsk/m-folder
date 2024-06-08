@@ -22,19 +22,20 @@ public class FileUtils {
         return new ArrayList<>();
     }
 
-    public static List<File> clearProperFilesAndGetExistedFiles(List<Track> dbTracks, List<File> properFiles) {
-        List<File> existedFiles = new ArrayList<>();
-        for (Track track : dbTracks) {
-            properFiles.stream()
-                    .filter(file -> track.getFilePath().equals(file.getAbsolutePath()))
-                    .forEach(existedFiles::add);
-        }
-        return properFiles.stream()
-                .filter(file -> !existedFiles.contains(file))
+    public static List<File> getExistedFilesAndClearProperFiles(List<Track> dbTracks, List<File> properFiles) {
+        // Find and collect existed files
+        List<File> existedFiles = dbTracks.stream()
+                .flatMap(track -> properFiles.stream()
+                        .filter(file -> track.getFilePath().equals(file.getAbsolutePath())))
                 .collect(Collectors.toList());
+
+        // Remove existed files from properFiles
+        properFiles.removeAll(existedFiles);
+
+        return existedFiles;
     }
 
-    public static void addExistedTracksToAllTracks(List<Track> dbTracks, List<File> existedFiles, Track firstTrack, List<Track> allTracks, List<Integer> playList) {
+    public static void addExistedTracksToAllTracksAndPlayList(List<Track> dbTracks, List<File> existedFiles, Track firstTrack, List<Track> allTracks, List<Integer> playList) {
         Collections.shuffle(existedFiles);
         for (File file : existedFiles) {
             dbTracks.stream()
