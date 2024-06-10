@@ -30,44 +30,48 @@ public class OptionsMenuHandler {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, context.getString(R.string.menu_path_to_music));
-        menu.add(0, 2, 0, context.getString(R.string.menu_track_info));
-        menu.add(0, 3, 0, context.getString(R.string.menu_delete_track));
-        menu.add(0, 4, 0, context.getString(R.string.menu_deleted_tracks_info));
-        menu.add(0, 5, 0, context.getString(R.string.menu_clear_deletions));
-        menu.add(0, 6, 0, context.getString(R.string.menu_exit));
+        menu.add(0, 2, 0, context.getString(R.string.menu_edit_path));
+        menu.add(0, 3, 0, context.getString(R.string.menu_track_info));
+        menu.add(0, 4, 0, context.getString(R.string.menu_delete_track));
+        menu.add(0, 5, 0, context.getString(R.string.menu_deleted_tracks_info));
+        menu.add(0, 6, 0, context.getString(R.string.menu_clear_deletions));
+        menu.add(0, 7, 0, context.getString(R.string.menu_exit));
         return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 1: // path to music
+                mainActivity.player.initPath();
+                break;
+            case 2: // edit path
                 mainActivity.player.editPath();
                 break;
-            case 2: // track info
+            case 3: // track info
                 String trackInfo = currentTrack.getFilePath();
                 Log.d(TAG, trackInfo);
                 Intent intent = new Intent(mainActivity, ListActivity.class);
                 intent.putExtra("content", trackInfo);
                 mainActivity.startActivity(intent);
                 break;
-            case 3:
+            case 4:
                 deleteTrack();
                 break;
-            case 4:
+            case 5:
                 String deletedTracksInfo = Helper.getDeletedTracksInfo(mainActivity.baseService.getDeletions());
                 Log.d(TAG, deletedTracksInfo);
                 Intent deletedIntent = new Intent(mainActivity, ListActivity.class);
                 deletedIntent.putExtra("content", deletedTracksInfo);
                 mainActivity.startActivity(deletedIntent);
                 break;
-            case 5:
+            case 6:
                 int clearedDeletions = mainActivity.baseService.clearDeletions();
                 Toast.makeText(mainActivity, String.format(Locale.ENGLISH,
                                 "%d deleted tracks was cleared",
                                 clearedDeletions),
                         Toast.LENGTH_LONG).show();
                 break;
-            case 6:
+            case 7:
                 showExitConfirmationDialog();
                 break;
         }

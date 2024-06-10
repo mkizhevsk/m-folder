@@ -1,6 +1,8 @@
 package com.mk.m_folder.media;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,12 +12,15 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Message;
 import android.provider.DocumentsContract;
+import android.text.InputType;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -104,11 +109,11 @@ public class Player {
                 tracksThread = new Thread(new TracksRunnable());
                 tracksThread.start();
             } else {
-                editPath();
+                initPath();
             }
         } catch (Exception e) {
             Log.e(TAG, "Player getMediaFiles media exception: " + e.getMessage(), e);
-            editPath();
+            initPath();
         }
     }
 
@@ -248,7 +253,7 @@ public class Player {
         mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 10000);
     }
 
-    public void editPath() {
+    public void initPath() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         ((MainActivity) context).startActivityForResult(intent, REQUEST_CODE_OPEN_DIRECTORY);
     }
@@ -285,6 +290,40 @@ public class Player {
                 }
             }
         }
+    }
+
+    public void editPath() {
+        // Create an AlertDialog Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.edit_path_title));
+
+        // Set up the input
+        final EditText input = new EditText(context);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(tempPath);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newPath = input.getText().toString();
+                Log.d(TAG, "newPath " + newPath);
+
+                // Do something with the new path
+                tempPath = newPath;
+
+                Toast.makeText(context, context.getString(R.string.path_updated), Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     public void reset() {

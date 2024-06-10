@@ -3,6 +3,7 @@
     <string name="service_desc" translatable="false">SQLite service</string>
 
     <string name="menu_path_to_music">Path to Music</string>
+    <string name="menu_edit_path">Edit path</string>
     <string name="menu_track_info">Track Info</string>
     <string name="menu_delete_track">Delete Track</string>
     <string name="menu_deleted_tracks_info">Deleted Tracks Info</string>
@@ -11,4 +12,7 @@
 
     <string name="exit_confirmation_title">Exit Confirmation</string>
     <string name="exit_confirmation_message">Are you sure you want to exit?</string>
+
+    <string name="edit_path_title">Edit Path</string>
+    <string name="path_updated">Path updated successfully</string>
 </resources>

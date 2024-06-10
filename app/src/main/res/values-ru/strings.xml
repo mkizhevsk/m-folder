@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="menu_path_to_music">Путь к музыке</string>
+    <string name="menu_edit_path">Редактировать путь</string>
     <string name="menu_track_info">Информация о треке</string>
     <string name="menu_delete_track">Удалить трек</string>
     <string name="menu_deleted_tracks_info">Информация об удаленных треках</string>
@@ -9,4 +10,7 @@
 
     <string name="exit_confirmation_title">Подтверждение выхода</string>
     <string name="exit_confirmation_message">Вы уверены, что хотите выйти?</string>
+
+    <string name="edit_path_title">Изменить путь</string>
+    <string name="path_updated">Путь успешно обновлен</string>
 </resources>
